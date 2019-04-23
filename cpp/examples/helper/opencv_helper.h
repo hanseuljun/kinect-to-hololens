@@ -1,20 +1,15 @@
+#pragma once
+
+#include <opencv2/opencv.hpp>
+#include "frames.h"
+
 namespace rgbd_streamer
 {
-namespace internal
+cv::Mat convertYuv420ByteFrameToBgrMat(Yuv420ByteFrame& frame)
 {
-cv::Mat convertBytesToMat(int width, int height, const std::vector<uint8_t>& v)
-{
-    cv::Mat mat(height, width, CV_8UC1);
-    memcpy(mat.data, v.data(), width * height);
-    return mat;
-}
-} // end of namespace internal
-
-cv::Mat convertYuv420ByteFrameToBgrMat(const Yuv420ByteFrame& frame)
-{
-    cv::Mat y_channel = internal::convertBytesToMat(frame.width(), frame.height(), frame.y_channel());
-    cv::Mat u_channel = internal::convertBytesToMat(frame.width() / 2, frame.height() / 2, frame.u_channel());
-    cv::Mat v_channel = internal::convertBytesToMat(frame.width() / 2, frame.height() / 2, frame.v_channel());
+    cv::Mat y_channel(frame.height(), frame.width(), CV_8UC1, frame.y_channel_data());
+    cv::Mat u_channel(frame.height() / 2, frame.width() / 2, CV_8UC1, frame.u_channel_data());
+    cv::Mat v_channel(frame.height() / 2, frame.width() / 2, CV_8UC1, frame.v_channel_data());
     cv::Mat cr_channel;
     cv::Mat cb_channel;
     // u and v corresponds to Cb and Cr
@@ -34,7 +29,7 @@ cv::Mat convertYuv420ByteFrameToBgrMat(const Yuv420ByteFrame& frame)
     return bgr_frame;
 }
 
-cv::Mat convertKinectDepthFrameToBgrMat(const std::vector<uint16_t> depth_frame)
+cv::Mat convertKinectDepthFrameToBgrMat(const uint16_t* depth_frame)
 {
     const int WIDTH = 512;
     const int HEIGHT = 424;

@@ -7,6 +7,8 @@ set(SOURCE_FILES
   frames.cpp
   rvl.h
   rvl.cpp
+  encoder.h
+  encoder.cpp
 )
 
 add_library(RgbdStreamerLib ${SOURCE_FILES})

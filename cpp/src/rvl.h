@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 
 // This algorithm comes from

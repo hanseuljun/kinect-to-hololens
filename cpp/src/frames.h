@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 
 namespace rgbd_streamer
@@ -26,6 +28,9 @@ public:
     const std::vector<T>& y_channel() const { return y_channel_; }
     const std::vector<T>& u_channel() const { return u_channel_; }
     const std::vector<T>& v_channel() const { return v_channel_; }
+    T* y_channel_data() { return y_channel_.data(); }
+    T* u_channel_data() { return u_channel_.data(); }
+    T* v_channel_data() { return v_channel_.data(); }
     int width() const { return width_; }
     int height() const { return height_; }
 

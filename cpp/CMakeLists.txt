@@ -5,6 +5,13 @@ include_directories("${PROJECT_SOURCE_DIR}/src")
 
 set(LIBFREENECT2_DIR ${PROJECT_SOURCE_DIR}/third_party/libfreenect2-0.2.0-usbdk-vs2015-x64)
 
+# By adding path for asio, the include folder made by vcpkg gets added.
+# No need add find_path for other libraries.
+find_path(VCPKG_INCLUDE_DIR NAMES asio.hpp PATH_SUFFIXES asio)
+include_directories(${VCPKG_INCLUDE_DIR})
+
+set(Libvpx_LIB ${VCPKG_INCLUDE_DIR}/../lib/vpxmd.lib)
+
 # Add OpenCV. Use ${OpenCV_LIBS} to link libraries.
 find_package(OpenCV REQUIRED)
 
@@ -23,6 +30,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     ${OpenCV_LIBS}
     RgbdStreamerLib
     Kinect
+    ${Libvpx_LIB}
   )
   set_target_properties(KinectReaderDemo PROPERTIES
     CXX_STANDARD 17
