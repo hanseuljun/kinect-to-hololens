@@ -11,7 +11,10 @@ find_package(OpenCV REQUIRED)
 add_subdirectory(src)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  add_executable(KinectReaderDemo examples/kinect_reader_demo.cpp)
+  add_executable(KinectReaderDemo
+    examples/kinect_reader_demo.cpp
+    examples/helper/opencv_helper.h
+  )
   target_include_directories(KinectReaderDemo PRIVATE
     "$ENV{KINECTSDK20_DIR}/inc"
     "${LIBFREENECT2_DIR}/include"

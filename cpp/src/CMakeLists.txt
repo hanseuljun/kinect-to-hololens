@@ -5,6 +5,8 @@ endif()
 set(SOURCE_FILES
   frames.h
   frames.cpp
+  rvl.h
+  rvl.cpp
 )
 
 add_library(RgbdStreamerLib ${SOURCE_FILES})

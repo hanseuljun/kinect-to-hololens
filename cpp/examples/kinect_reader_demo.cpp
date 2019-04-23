@@ -3,40 +3,10 @@
 #include <opencv2/opencv.hpp>
 #include "frames.h"
 #include "kinect/kinect.h"
+#include "helper/opencv_helper.h"
 
 namespace rgbd_streamer
 {
-cv::Mat convertBytesToMat(int width, int height, const std::vector<uint8_t>& v)
-{
-    cv::Mat mat(height, width, CV_8UC1);
-    memcpy(mat.data, v.data(), width * height);
-    return mat;
-}
-
-cv::Mat convertYuv420ByteFrameToBgrMat(const Yuv420ByteFrame& frame)
-{
-    cv::Mat y_channel = convertBytesToMat(frame.width(), frame.height(), frame.y_channel());
-    cv::Mat u_channel = convertBytesToMat(frame.width() / 2, frame.height() / 2, frame.u_channel());
-    cv::Mat v_channel = convertBytesToMat(frame.width() / 2, frame.height() / 2, frame.v_channel());
-    cv::Mat cr_channel;
-    cv::Mat cb_channel;
-    // u and v corresponds to Cb and Cr
-    cv::resize(v_channel, cr_channel, cv::Size(v_channel.cols * 2, v_channel.rows * 2));
-    cv::resize(u_channel, cb_channel, cv::Size(u_channel.cols * 2, u_channel.rows * 2));
-
-    std::vector<cv::Mat> y_cr_cb_channels;
-    y_cr_cb_channels.push_back(y_channel);
-    y_cr_cb_channels.push_back(cr_channel);
-    y_cr_cb_channels.push_back(cb_channel);
-
-    cv::Mat y_cr_cb_frame;
-    cv::merge(y_cr_cb_channels, y_cr_cb_frame);
-
-    cv::Mat bgr_frame = y_cr_cb_frame.clone();
-    cvtColor(y_cr_cb_frame, bgr_frame, CV_YCrCb2BGR);
-    return bgr_frame;
-}
-
 void print_intrinsics()
 {
     auto intrinsics = kinect::obtainKinectIntrinsics();
@@ -90,6 +60,7 @@ void print_intrinsics()
         std::cout << "no kinect" << std::endl;
     }
 }
+
 void print_frame_info()
 {
     auto device = kinect::obtainKinectDevice();
@@ -99,8 +70,10 @@ void print_frame_info()
         return;
     }
 
-    std::string name = "kinect frame";
-    cv::namedWindow(name, 1);
+    std::string color_name = "kinect color frame";
+    std::string depth_name = "kinect depth frame";
+    cv::namedWindow(color_name, 1);
+    cv::namedWindow(depth_name, 1);
 
     for (;;)
     {
@@ -115,11 +88,28 @@ void print_frame_info()
         auto frame_interval = kinect_frame->color_frame()->getColorCameraSettings()->getFrameInterval();
         std::cout << "frame_interval: " << frame_interval << std::endl;
 
-        auto yuv420_byte_frame = createDownsampledYuv420ByteFromKinectColorFrame(kinect_frame->color_frame()->getRawUnderlyingBuffer());
+        auto yuv420_byte_frame = createDownsampledYuv420ByteFrameFromKinectColorFrame(kinect_frame->color_frame()->getRawUnderlyingBuffer());
         //std::cout << "width: " << yuv420_byte_frame.width() << std::endl;
         //std::cout << "y[0]: " << static_cast<int>(yuv420_byte_frame.y_channel()[0]) << std::endl;
-        auto bgr_mat = convertYuv420ByteFrameToBgrMat(yuv420_byte_frame);
-        cv::imshow(name, bgr_mat);
+        auto color_bgr_mat = convertYuv420ByteFrameToBgrMat(yuv420_byte_frame);
+
+        auto rvl_frame = createRvlFrameFromKinectDepthFrame(kinect_frame->depth_frame()->getUnderlyingBuffer());
+        std::cout << "rvl size: " << rvl_frame.size() << std::endl;
+        auto depth_frame = createDepthFrameFromRvlFrame(rvl_frame.data());
+
+        auto underlying_buffer = kinect_frame->depth_frame()->getUnderlyingBuffer();
+        for (int i = 0; i < depth_frame.size(); ++i) {
+            if (depth_frame[i] != underlying_buffer[i])
+                std::cout << "a descrepency at " << i << std::endl;
+        }
+
+        std::cout << "print_frame_info - 1" << std::endl;
+        auto depth_bgr_mat = convertKinectDepthFrameToBgrMat(depth_frame);
+        std::cout << "print_frame_info - 2" << std::endl;
+
+        cv::imshow(color_name, color_bgr_mat);
+        std::cout << "print_frame_info - 3" << std::endl;
+        cv::imshow(depth_name, depth_bgr_mat);
         if (cv::waitKey(1) >= 0)
             break;
     }
