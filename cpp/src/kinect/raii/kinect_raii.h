@@ -13,111 +13,112 @@ namespace raii
 class KinectColorCameraSettings
 {
 public:
-	KinectColorCameraSettings(IColorCameraSettings* color_camera_settings);
-	~KinectColorCameraSettings();
-	KinectColorCameraSettings(const KinectColorCameraSettings& other) = delete;
-	KinectColorCameraSettings& operator=(const KinectColorCameraSettings& other) = delete;
-	int64_t getFrameInterval();
+    KinectColorCameraSettings(IColorCameraSettings* color_camera_settings);
+    ~KinectColorCameraSettings();
+    KinectColorCameraSettings(const KinectColorCameraSettings& other) = delete;
+    KinectColorCameraSettings& operator=(const KinectColorCameraSettings& other) = delete;
+    int64_t getFrameInterval();
 
 private:
-	IColorCameraSettings* color_camera_settings_;
+    IColorCameraSettings* color_camera_settings_;
 };
 
 class KinectColorFrame
 {
 public:
-	KinectColorFrame(IColorFrame* color_frame);
-	~KinectColorFrame();
-	KinectColorFrame(const KinectColorFrame& other) = delete;
-	KinectColorFrame& operator=(const KinectColorFrame& other) = delete;
-	std::unique_ptr<KinectColorCameraSettings> getColorCameraSettings();
+    KinectColorFrame(IColorFrame* color_frame);
+    ~KinectColorFrame();
+    KinectColorFrame(const KinectColorFrame& other) = delete;
+    KinectColorFrame& operator=(const KinectColorFrame& other) = delete;
+    std::unique_ptr<KinectColorCameraSettings> getColorCameraSettings();
+    BYTE* getRawUnderlyingBuffer();
 
 private:
-	IColorFrame* color_frame_;
+    IColorFrame* color_frame_;
 };
 
 class KinectDepthFrame
 {
 public:
-	KinectDepthFrame(IDepthFrame* depth_frame);
-	~KinectDepthFrame();
-	KinectDepthFrame(const KinectDepthFrame& other) = delete;
-	KinectDepthFrame& operator=(const KinectDepthFrame& other) = delete;
-	UINT16* getBuffer();
+    KinectDepthFrame(IDepthFrame* depth_frame);
+    ~KinectDepthFrame();
+    KinectDepthFrame(const KinectDepthFrame& other) = delete;
+    KinectDepthFrame& operator=(const KinectDepthFrame& other) = delete;
+    UINT16* getUnderlyingBuffer();
 
 private:
-	IDepthFrame* depth_frame_;
+    IDepthFrame* depth_frame_;
 };
 
 class KinectBody
 {
 public:
-	KinectBody(IBody* body);
-	~KinectBody();
-	KinectBody(const KinectBody& other) = delete;
-	KinectBody& operator=(const KinectBody& other) = delete;
-	bool isTracked();
-	Joint getHeadJoint();
+    KinectBody(IBody* body);
+    ~KinectBody();
+    KinectBody(const KinectBody& other) = delete;
+    KinectBody& operator=(const KinectBody& other) = delete;
+    bool isTracked();
+    Joint getHeadJoint();
 
 private:
-	IBody* body_;
+    IBody* body_;
 };
 
 class KinectBodyFrame
 {
 public:
-	KinectBodyFrame(IBodyFrame* body_frame);
-	~KinectBodyFrame();
-	KinectBodyFrame(const KinectBodyFrame& other) = delete;
-	KinectBodyFrame& operator=(const KinectBodyFrame& other) = delete;
-	std::vector<Joint> getHeadJoints();
-	Vector4 getFloorClipPlane();
+    KinectBodyFrame(IBodyFrame* body_frame);
+    ~KinectBodyFrame();
+    KinectBodyFrame(const KinectBodyFrame& other) = delete;
+    KinectBodyFrame& operator=(const KinectBodyFrame& other) = delete;
+    std::vector<Joint> getHeadJoints();
+    Vector4 getFloorClipPlane();
 
 private:
-	IBodyFrame* body_frame_;
+    IBodyFrame* body_frame_;
 };
 
 class KinectMultiSourceFrame
 {
 public:
-	KinectMultiSourceFrame(IMultiSourceFrame* multi_source_frame);
-	~KinectMultiSourceFrame();
-	KinectMultiSourceFrame(const KinectMultiSourceFrame& other) = delete;
-	KinectMultiSourceFrame& operator=(const KinectMultiSourceFrame& other) = delete;
-	std::unique_ptr<KinectColorFrame> getColorFrame();
-	std::unique_ptr<KinectDepthFrame> getDepthFrame();
-	std::unique_ptr<KinectBodyFrame> getBodyFrame();
+    KinectMultiSourceFrame(IMultiSourceFrame* multi_source_frame);
+    ~KinectMultiSourceFrame();
+    KinectMultiSourceFrame(const KinectMultiSourceFrame& other) = delete;
+    KinectMultiSourceFrame& operator=(const KinectMultiSourceFrame& other) = delete;
+    std::unique_ptr<KinectColorFrame> getColorFrame();
+    std::unique_ptr<KinectDepthFrame> getDepthFrame();
+    std::unique_ptr<KinectBodyFrame> getBodyFrame();
 
 private:
-	IMultiSourceFrame* multi_source_frame_;
+    IMultiSourceFrame* multi_source_frame_;
 };
 
 class KinectMultiSourceFrameReader
 {
 public:
-	KinectMultiSourceFrameReader(IMultiSourceFrameReader* multi_source_frame_reader);
-	~KinectMultiSourceFrameReader();
-	KinectMultiSourceFrameReader(const KinectMultiSourceFrameReader& other) = delete;
-	KinectMultiSourceFrameReader& operator=(const KinectMultiSourceFrameReader& other) = delete;
-	std::unique_ptr<KinectMultiSourceFrame> getMultiSourceFrame();
+    KinectMultiSourceFrameReader(IMultiSourceFrameReader* multi_source_frame_reader);
+    ~KinectMultiSourceFrameReader();
+    KinectMultiSourceFrameReader(const KinectMultiSourceFrameReader& other) = delete;
+    KinectMultiSourceFrameReader& operator=(const KinectMultiSourceFrameReader& other) = delete;
+    std::unique_ptr<KinectMultiSourceFrame> getMultiSourceFrame();
 
 private:
-	IMultiSourceFrameReader* multi_source_frame_reader_;
+    IMultiSourceFrameReader* multi_source_frame_reader_;
 };
 
 class KinectSensor
 {
 public:
-	KinectSensor(IKinectSensor* kinect_sensor);
-	~KinectSensor();
-	KinectSensor(const KinectSensor& other) = delete;
-	KinectSensor& operator=(const KinectSensor& other) = delete;
-	static std::unique_ptr<KinectSensor> create();
-	bool isAvailable();
-	std::unique_ptr<KinectMultiSourceFrameReader> getMultiSourceFrameReader();
+    KinectSensor(IKinectSensor* kinect_sensor);
+    ~KinectSensor();
+    KinectSensor(const KinectSensor& other) = delete;
+    KinectSensor& operator=(const KinectSensor& other) = delete;
+    static std::unique_ptr<KinectSensor> create();
+    bool isAvailable();
+    std::unique_ptr<KinectMultiSourceFrameReader> getMultiSourceFrameReader();
 
 private:
-	IKinectSensor* kinect_sensor_;
+    IKinectSensor* kinect_sensor_;
 };
 }
 }

@@ -5,6 +5,9 @@ include_directories("${PROJECT_SOURCE_DIR}/src")
 
 set(LIBFREENECT2_DIR ${PROJECT_SOURCE_DIR}/third_party/libfreenect2-0.2.0-usbdk-vs2015-x64)
 
+# Add OpenCV. Use ${OpenCV_LIBS} to link libraries.
+find_package(OpenCV REQUIRED)
+
 add_subdirectory(src)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -14,6 +17,8 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     "${LIBFREENECT2_DIR}/include"
   )
   target_link_libraries(KinectReaderDemo
+    ${OpenCV_LIBS}
+    RgbdStreamerLib
     Kinect
   )
   set_target_properties(KinectReaderDemo PROPERTIES
