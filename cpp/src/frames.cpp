@@ -4,7 +4,7 @@
 
 namespace rgbd_streamer
 {
-Yuv420ByteFrame createYuv420ByteFrameFromKinectColorFrame(uint8_t* buffer)
+YuvFrame createYuvFrameFromKinectColorBuffer(uint8_t* buffer)
 {
     // The width and height of Kinect's color frames.
     const int WIDTH = 1920;
@@ -31,11 +31,11 @@ Yuv420ByteFrame createYuv420ByteFrameFromKinectColorFrame(uint8_t* buffer)
         }
     }
 
-    return Yuv420ByteFrame(std::move(y_channel), std::move(u_channel), std::move(v_channel), WIDTH, HEIGHT);
+    return YuvFrame(std::move(y_channel), std::move(u_channel), std::move(v_channel), WIDTH, HEIGHT);
 }
 
 // Downsample width and height by 2.
-Yuv420ByteFrame createDownsampledYuv420ByteFrameFromKinectColorFrame(uint8_t* buffer)
+YuvFrame createHalfSizedYuvFrameFromKinectColorBuffer(uint8_t* buffer)
 {
     // The width and height of Kinect's color frames.
     const int WIDTH = 1920;
@@ -74,10 +74,29 @@ Yuv420ByteFrame createDownsampledYuv420ByteFrameFromKinectColorFrame(uint8_t* bu
         }
     }
 
-    return Yuv420ByteFrame(std::move(y_channel), std::move(u_channel), std::move(v_channel), DOWNSAMPLED_WIDTH, DOWNSAMPLED_HEIGHT);
+    return YuvFrame(std::move(y_channel), std::move(u_channel), std::move(v_channel), DOWNSAMPLED_WIDTH, DOWNSAMPLED_HEIGHT);
 }
 
-std::vector<uint8_t> createRvlFrameFromKinectDepthFrame(uint16_t* buffer)
+std::vector<uint8_t> convertPicturePlaneToBytes(uint8_t* data, int line_size, int width, int height)
+{
+    std::vector<uint8_t> bytes(width * height);
+    for (int i = 0; i < height; ++i)
+        memcpy(bytes.data() + i * width, data + i * line_size, width);
+
+    return bytes;
+}
+
+YuvFrame createYuvFrameFromAvFrame(AVFrame* av_frame)
+{
+    return YuvFrame(
+        std::move(convertPicturePlaneToBytes(av_frame->data[0], av_frame->linesize[0], av_frame->width, av_frame->height)),
+        std::move(convertPicturePlaneToBytes(av_frame->data[1], av_frame->linesize[1], av_frame->width / 2, av_frame->height / 2)),
+        std::move(convertPicturePlaneToBytes(av_frame->data[2], av_frame->linesize[2], av_frame->width / 2, av_frame->height / 2)),
+        av_frame->width,
+        av_frame->height);
+}
+
+std::vector<uint8_t> createRvlFrameFromKinectDepthBuffer(uint16_t* buffer)
 {
     // The width and height of Kinect's depth frames.
     const int WIDTH = 512;

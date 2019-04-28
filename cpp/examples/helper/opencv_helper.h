@@ -5,11 +5,11 @@
 
 namespace rgbd_streamer
 {
-cv::Mat convertYuv420ByteFrameToBgrMat(Yuv420ByteFrame& frame)
+cv::Mat convertYuvFrameToCvMat(YuvFrame& yuv_frame)
 {
-    cv::Mat y_channel(frame.height(), frame.width(), CV_8UC1, frame.y_channel_data());
-    cv::Mat u_channel(frame.height() / 2, frame.width() / 2, CV_8UC1, frame.u_channel_data());
-    cv::Mat v_channel(frame.height() / 2, frame.width() / 2, CV_8UC1, frame.v_channel_data());
+    cv::Mat y_channel(yuv_frame.height(), yuv_frame.width(), CV_8UC1, yuv_frame.y_channel().data());
+    cv::Mat u_channel(yuv_frame.height() / 2, yuv_frame.width() / 2, CV_8UC1, yuv_frame.u_channel().data());
+    cv::Mat v_channel(yuv_frame.height() / 2, yuv_frame.width() / 2, CV_8UC1, yuv_frame.v_channel().data());
     cv::Mat cr_channel;
     cv::Mat cb_channel;
     // u and v corresponds to Cb and Cr
@@ -29,7 +29,7 @@ cv::Mat convertYuv420ByteFrameToBgrMat(Yuv420ByteFrame& frame)
     return bgr_frame;
 }
 
-cv::Mat convertKinectDepthFrameToBgrMat(const uint16_t* depth_frame)
+cv::Mat convertKinectDepthBufferToCvMat(const uint16_t* depth_buffer)
 {
     const int WIDTH = 512;
     const int HEIGHT = 424;
@@ -38,7 +38,7 @@ cv::Mat convertKinectDepthFrameToBgrMat(const uint16_t* depth_frame)
     std::vector<uint8_t> half(WIDTH * HEIGHT);
 
     for (int i = 0; i < WIDTH * HEIGHT; ++i) {
-        reduced_depth_frame[i] = depth_frame[i] / 16;
+        reduced_depth_frame[i] = depth_buffer[i] / 32;
         half[i] = 128;
     }
 

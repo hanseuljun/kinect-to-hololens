@@ -9,6 +9,12 @@ set(SOURCE_FILES
   rvl.cpp
   encoder.h
   encoder.cpp
+  decoder.h
+  decoder.cpp
 )
 
 add_library(RgbdStreamerLib ${SOURCE_FILES})
+
+target_link_libraries(RgbdStreamerLib
+  ${FFMPEG_LIBRARIES}
+)

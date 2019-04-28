@@ -8,17 +8,12 @@
 
 namespace rgbd_streamer
 {
-template <typename T>
-class LibvpxEncoder
+class ColorEncoder
 {
 public:
-    LibvpxEncoder(vpx_codec_ctx_t codec, vpx_image_t image);
-    ~LibvpxEncoder();
-    std::vector<uint8_t> encode(Yuv420Frame<T>& frame);
-    static std::vector<uint8_t> encodeFrame(vpx_codec_ctx_t* codec,
-        vpx_image_t* image,
-        int frame_index,
-        int flags);
+    ColorEncoder(vpx_codec_ctx_t codec, vpx_image_t image);
+    ~ColorEncoder();
+    std::vector<uint8_t> encode(YuvFrame& av_frame);
 
 private:
     vpx_codec_ctx_t codec_;
@@ -27,5 +22,5 @@ private:
     int frame_index_;
 };
 
-std::unique_ptr<LibvpxEncoder<uint8_t>> createVp8Encoder(int width, int height, int target_bitrate);
+std::unique_ptr<ColorEncoder> createColorEncoder(int width, int height, int target_bitrate);
 }

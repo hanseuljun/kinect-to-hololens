@@ -12,6 +12,13 @@ include_directories(${VCPKG_INCLUDE_DIR})
 
 set(Libvpx_LIB ${VCPKG_INCLUDE_DIR}/../lib/vpxmd.lib)
 
+# Set FFMPEG_LIBRARIES to link ffmpeg.
+unset(FFMPEG_LIBRARIES CACHE)
+foreach(FFMPEG_SUBLIBRARY avcodec avdevice avfilter avformat avutil swresample swscale)
+  find_library(FFMPEG_lib${FFMPEG_SUBLIBRARY}_LIBRARY NAMES ${FFMPEG_SUBLIBRARY})
+  list(APPEND FFMPEG_LIBRARIES ${FFMPEG_lib${FFMPEG_SUBLIBRARY}_LIBRARY})
+endforeach()
+
 # Add OpenCV. Use ${OpenCV_LIBS} to link libraries.
 find_package(OpenCV REQUIRED)
 
