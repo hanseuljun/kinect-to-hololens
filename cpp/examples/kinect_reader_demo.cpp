@@ -93,6 +93,7 @@ int main()
     //rgbd_streamer::print_intrinsics();
     //rgbd_streamer::display_frames();
     rgbd_streamer::display_frames_with_encoding();
+    //rgbd_streamer::display_textures();
     std::cin.get();
     return 0;
 }

@@ -11,10 +11,16 @@ set(SOURCE_FILES
   encoder.cpp
   decoder.h
   decoder.cpp
+  sender.h
+  receiver.h
+  receiver.cpp
 )
 
 add_library(RgbdStreamerLib ${SOURCE_FILES})
 
 target_link_libraries(RgbdStreamerLib
   ${FFMPEG_LIBRARIES}
+)
+set_target_properties(RgbdStreamerLib PROPERTIES
+  CXX_STANDARD 17
 )
