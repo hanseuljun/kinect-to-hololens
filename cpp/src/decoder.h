@@ -10,7 +10,9 @@ namespace rgbd_streamer
 class ColorDecoder
 {
 public:
-    ColorDecoder(AVCodecID av_codec_id);
+    ColorDecoder(AVPacket* packet, AVCodec* codec,
+        AVCodecParserContext* codec_parser_context,
+        AVCodecContext* codec_context);
     ~ColorDecoder();
     ColorDecoderFrame decode(const std::vector<uint8_t>& av_frame);
 

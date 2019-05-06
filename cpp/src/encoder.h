@@ -1,6 +1,5 @@
 #pragma once
 
-#include <exception>
 #include <memory>
 #include <vpx/vp8cx.h>
 #include <vpx/vpx_codec.h>

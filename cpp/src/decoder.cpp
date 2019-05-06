@@ -5,40 +5,14 @@
 
 namespace rgbd_streamer
 {
-ColorDecoder::ColorDecoder(AVCodecID av_codec_id)
-    : packet_(nullptr), codec_(nullptr), codec_parser_context_(nullptr), codec_context_(nullptr)
+ColorDecoder::ColorDecoder(AVPacket* packet, AVCodec* codec,
+    AVCodecParserContext* codec_parser_context,
+    AVCodecContext* codec_context)
+    : packet_(packet)
+    , codec_(codec)
+    , codec_parser_context_(codec_parser_context)
+    , codec_context_(codec_context)
 {
-    av_log_set_level(AV_LOG_INFO);
-
-    packet_ = av_packet_alloc();
-    if (!packet_) {
-        std::cout << "av_packet_alloc failed" << std::endl;
-        return;
-    }
-
-    avcodec_register_all();
-    codec_ = avcodec_find_decoder(av_codec_id);
-    if (!codec_) {
-        std::cout << "avcodec_find_decoder failed" << std::endl;
-        return;
-    }
-
-    codec_parser_context_ = av_parser_init(codec_->id);
-    if (!codec_parser_context_) {
-        std::cout << "codec_parser_context not found" << std::endl;
-        return;
-    }
-
-    codec_context_ = avcodec_alloc_context3(codec_);
-    if (!codec_context_) {
-        std::cout << "avcodec_alloc_context3 failed" << std::endl;
-        return;
-    }
-
-    /* open it */
-    if (avcodec_open2(codec_context_, codec_, nullptr) < 0) {
-        std::cout << "avcodec_open2 failed" << std::endl;
-    }
 }
 
 ColorDecoder::~ColorDecoder()
@@ -53,35 +27,27 @@ ColorDecoder::~ColorDecoder()
         avcodec_free_context(&codec_context_);
 }
 
-void decodePacket(std::vector<ColorDecoderFrame>& output, AVCodecContext* codec_context, AVPacket* pkt)
+void decodePacket(std::vector<ColorDecoderFrame>& decoder_frames, AVCodecContext* codec_context, AVPacket* pkt)
 {
-    int send_packet_result = avcodec_send_packet(codec_context, pkt);
-    if (send_packet_result < 0) {
-        //-1094995529 means AVERROR_INVALIDDATA
-        std::cout << "avcodec_send_packet failed in FfmpegDecoder::decodePacket... error code: " << send_packet_result << std::endl;
-        throw std::exception("avcodec_send_packet failed in FfmpegDecoder::decodePacket");
-    }
+    if (avcodec_send_packet(codec_context, pkt) < 0)
+        throw std::exception("Error from avcodec_send_packet.");
 
     while (true) {
-        ColorDecoderFrame av_frame(av_frame_alloc());
-        if (!av_frame.av_frame()) {
-            throw std::exception("av_frame_alloc failed in FfmpegDecoder::decodePacket...");
-        }
-        av_frame.av_frame()->format = AV_PIX_FMT_YUV420P;
+        auto av_frame = av_frame_alloc();
+        if (!av_frame)
+            throw std::exception("Error from av_frame_alloc.");
+        
+        av_frame->format = AV_PIX_FMT_YUV420P;
 
-        int receive_frame_result = avcodec_receive_frame(codec_context, av_frame.av_frame());
+        int receive_frame_result = avcodec_receive_frame(codec_context, av_frame);
         if (receive_frame_result == AVERROR(EAGAIN) || receive_frame_result == AVERROR_EOF) {
             return;
-        }
-        else if (receive_frame_result < 0) {
-            std::cout << "avcodec_receive_frame failed in FfmpegDecoder::decodePacket... error code: " << receive_frame_result << std::endl;
-            throw std::exception("avcodec_send_packet failed in FfmpegDecoder::decodePacket");
+        } else if (receive_frame_result < 0) {
+            throw std::exception("Error from avcodec_send_packet.");
         }
 
         fflush(stdout);
-
-        /* the picture is allocated by the decoder. no need to free it */
-        output.push_back(std::move(av_frame));
+        decoder_frames.emplace_back(av_frame);
     }
 
     return;
@@ -89,10 +55,10 @@ void decodePacket(std::vector<ColorDecoderFrame>& output, AVCodecContext* codec_
 
 ColorDecoderFrame ColorDecoder::decode(const std::vector<uint8_t>& av_frame)
 {
-    std::vector<ColorDecoderFrame> output_frames;
+    std::vector<ColorDecoderFrame> decoder_frames;
     /* use the parser to split the data into frames */
     size_t data_size = av_frame.size();
-    // Adding a buffer padding is important!
+    // Adding buffer padding is important!
     // Removing this results in crashes that happens in a way hard to debug!!! (I know it since it happened to me...)
     // When it happens, it happens with av_parser_parse2.
     std::unique_ptr<uint8_t> padded_data(new uint8_t[data_size + AV_INPUT_BUFFER_PADDING_SIZE]);
@@ -103,61 +69,53 @@ ColorDecoderFrame ColorDecoder::decode(const std::vector<uint8_t>& av_frame)
     while (data_size > 0) {
         // Returns the number of bytes used.
         int size = av_parser_parse2(codec_parser_context_,
-            codec_context_,
-            &packet_->data,
-            &packet_->size,
-            data,
-            data_size,
-            AV_NOPTS_VALUE,
-            AV_NOPTS_VALUE,
-            0);
-        if (size < 0) {
-            std::cout << "Error while parsing" << std::endl;
-            throw std::exception("Error while parsing");
-        }
+            codec_context_, &packet_->data, &packet_->size,
+            data, data_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+
+        if (size < 0)
+            throw std::exception("Error from av_parser_parse2.");
+        
         data += size;
         data_size -= size;
 
         if (packet_->size)
-            decodePacket(output_frames, codec_context_, packet_);
-
-        if (codec_->capabilities & AV_CODEC_CAP_DELAY) {
-            //Read the following comment which came from the comments above AV_CODEC_CAP_DELAY to understand why the following code is here.
-            // * Decoders:
-            // * The decoder has a non-zero delay and needs to be fed with avpkt->data=NULL,
-            // * avpkt->size=0 at the end to get the delayed data until the decoder no longer
-            // * returns frames.
-            if (data_size == 0) {
-                size = av_parser_parse2(codec_parser_context_,
-                    codec_context_,
-                    &packet_->data,
-                    &packet_->size,
-                    nullptr,
-                    0,
-                    AV_NOPTS_VALUE,
-                    AV_NOPTS_VALUE,
-                    0);
-
-                if (size < 0) {
-                    std::cout << "Error while parsing" << std::endl;
-                    throw std::exception("Error while parsing");
-                }
-
-                decodePacket(output_frames, codec_context_, packet_);
-            }
-        }
+            decodePacket(decoder_frames, codec_context_, packet_);
     }
 
-    if (output_frames.size() != 1) {
-        std::cout << "Found " << output_frames.size() << " frames while there should be one." << std::endl;
-        throw std::exception("Found non-single frames.");
+    if (decoder_frames.size() != 1) {
+        throw std::exception("More or less than a frame found in ColorDecoder::decode.");
     }
 
-    return std::move(output_frames[0]);
+    return std::move(decoder_frames[0]);
 }
 
 std::unique_ptr<ColorDecoder> createColorDecoder()
 {
-    return std::make_unique<ColorDecoder>(AVCodecID::AV_CODEC_ID_VP8);
+    av_log_set_level(AV_LOG_INFO);
+    
+    const AVCodecID AV_CODEC_ID = AV_CODEC_ID_VP8;
+
+    auto packet = av_packet_alloc();
+    if (!packet)
+        throw std::exception("av_packet_alloc failed.");
+
+    avcodec_register_all();
+    auto codec = avcodec_find_decoder(AV_CODEC_ID);
+    if (!codec)
+        throw std::exception("avcodec_find_decoder failed.");
+
+    auto codec_parser_context = av_parser_init(codec->id);
+    if (!codec_parser_context)
+        throw std::exception("av_parser_init failed.");
+
+    auto codec_context = avcodec_alloc_context3(codec);
+    if (!codec_context)
+        throw std::exception("avcodec_alloc_context3 failed.");
+
+    /* open it */
+    if (avcodec_open2(codec_context, codec, nullptr) < 0)
+        throw std::exception("avcodec_open2 failed.");
+    
+    return std::make_unique<ColorDecoder>(packet, codec, codec_parser_context, codec_context);
 }
 }
