@@ -1,15 +1,27 @@
 #include <iostream>
 #include <asio.hpp>
 
+#include "kinect/kinect.h"
 #include "sender.h"
+#include "frames.h"
+#include "encoder.h"
 
-namespace rgbd_streamer
+namespace kh
 {
 void send_frames()
 {
-    int port = 7777;
+    const int PORT = 7777;
+
+    auto device = kinect::obtainKinectDevice();
+    if (!device) {
+        std::cout << "Could not find a kinect." << std::endl;
+        return;
+    }
+
+    auto encoder = createColorEncoder(960, 540, 2000);
+
     asio::io_context io_context;
-    Sender sender(io_context, port);
+    Sender sender(io_context, PORT);
     sender.accept();
 
     bool stopped = false;
@@ -18,16 +30,25 @@ void send_frames()
             io_context.run();
     });
 
-    int n = 0;
-    while (true) {
-        if (sender.accepted()) {
-            std::cout << "accepted" << std::endl;
-            try {
-                sender.send(n++);
-            } catch (std::exception& e) {
-                std::cout << e.what() << std::endl;
-                break;
-            }
+    int frame_id = 0;
+    for (;;) {
+        if (!sender.accepted())
+            continue;
+
+        auto kinect_frame = device->getFrame();
+        if (!kinect_frame)
+            continue;
+
+        auto yuv_frame = createHalfSizedYuvFrameFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
+        auto encoder_frame = encoder->encode(yuv_frame);
+
+        auto rvl_frame = createRvlFrameFromKinectDepthBuffer(kinect_frame->depth_frame()->getUnderlyingBuffer());
+
+        try {
+            sender.send(frame_id++, encoder_frame, rvl_frame);
+        } catch (std::exception& e) {
+            std::cout << e.what() << std::endl;
+            break;
         }
     }
 
@@ -39,7 +60,7 @@ void send_frames()
 
 int main()
 {
-    rgbd_streamer::send_frames();
+    kh::send_frames();
 
     return 0;
 }

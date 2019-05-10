@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace rgbd_streamer
+namespace kh
 {
 namespace kinect
 {

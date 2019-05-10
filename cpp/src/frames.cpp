@@ -2,7 +2,7 @@
 
 #include "rvl.h"
 
-namespace rgbd_streamer
+namespace kh
 {
 YuvFrame createYuvFrameFromKinectColorBuffer(uint8_t* buffer)
 {

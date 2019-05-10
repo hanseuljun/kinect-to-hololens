@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-namespace rgbd_streamer
+namespace kh
 {
 namespace kinect
 {

@@ -8,7 +8,7 @@ extern "C"
 #include <libavutil/frame.h>
 }
 
-namespace rgbd_streamer
+namespace kh
 {
 // Data of this class is not supposed to be copy since it will take a lot of computational resource.
 class YuvFrame

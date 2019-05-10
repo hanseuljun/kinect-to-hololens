@@ -4,7 +4,7 @@
 #include "decoder.h"
 #include "kinect/kinect.h"
 
-namespace rgbd_streamer
+namespace kh
 {
 void print_intrinsics()
 {
@@ -60,8 +60,6 @@ void display_frames_with_encoding()
 
     auto color_name = "kinect color frame";
     auto depth_name = "kinect depth frame";
-    cv::namedWindow(color_name, 1);
-    cv::namedWindow(depth_name, 1);
 
     auto encoder = createColorEncoder(960, 540, 2000);
     auto decoder = createColorDecoder();
@@ -90,10 +88,10 @@ void display_frames_with_encoding()
 
 int main()
 {
-    //rgbd_streamer::print_intrinsics();
-    //rgbd_streamer::display_frames();
-    rgbd_streamer::display_frames_with_encoding();
-    //rgbd_streamer::display_textures();
+    //kh::print_intrinsics();
+    //kh::display_frames();
+    kh::display_frames_with_encoding();
+    //kh::display_textures();
     std::cin.get();
     return 0;
 }

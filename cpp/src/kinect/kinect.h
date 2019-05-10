@@ -4,27 +4,29 @@
 #include "libfreenect2/libfreenect2.hpp"
 #include "raii/kinect_raii.h"
 
-namespace rgbd_streamer
+namespace kh
 {
 namespace kinect
 {
 class KinectFrame
 {
 public:
-    KinectFrame(std::shared_ptr<raii::KinectColorFrame> color_frame,
-        std::shared_ptr<raii::KinectDepthFrame> depth_frame,
-        std::shared_ptr<raii::KinectBodyFrame> body_frame)
-        : color_frame_(color_frame), depth_frame_(depth_frame), body_frame_(body_frame)
+    KinectFrame(std::unique_ptr<raii::KinectColorFrame> color_frame,
+        std::unique_ptr<raii::KinectDepthFrame> depth_frame,
+        std::unique_ptr<raii::KinectBodyFrame> body_frame)
+        : color_frame_(std::move(color_frame))
+        , depth_frame_(std::move(depth_frame))
+        , body_frame_(std::move(body_frame))
     {
     }
-    std::shared_ptr<raii::KinectColorFrame> color_frame() { return color_frame_; }
-    std::shared_ptr<raii::KinectDepthFrame> depth_frame() { return depth_frame_; }
-    std::shared_ptr<raii::KinectBodyFrame> body_frame() { return body_frame_; }
+    raii::KinectColorFrame* color_frame() { return color_frame_.get(); }
+    raii::KinectDepthFrame* depth_frame() { return depth_frame_.get(); }
+    raii::KinectBodyFrame* body_frame() { return body_frame_.get(); }
 
 private:
-    std::shared_ptr<raii::KinectColorFrame> color_frame_;
-    std::shared_ptr<raii::KinectDepthFrame> depth_frame_;
-    std::shared_ptr<raii::KinectBodyFrame> body_frame_;
+    std::unique_ptr<raii::KinectColorFrame> color_frame_;
+    std::unique_ptr<raii::KinectDepthFrame> depth_frame_;
+    std::unique_ptr<raii::KinectBodyFrame> body_frame_;
 };
 
 class KinectDevice

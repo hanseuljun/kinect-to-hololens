@@ -5,7 +5,7 @@
 #include <optional>
 #include <vector>
 
-namespace rgbd_streamer
+namespace kh
 {
 class MessageBuffer
 {
@@ -28,35 +28,22 @@ public:
     {
     }
 
-    void connect(std::string ip_address, int port)
+    bool connect(std::string ip_address, int port)
     {
         asio::ip::tcp::resolver resolver(socket_.get_io_context());
-        asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(ip_address, std::to_string(port));
-        std::error_code connect_error;
-        asio::connect(socket_, endpoints, connect_error);
+        auto endpoints = resolver.resolve(ip_address, std::to_string(port));
+        std::error_code error;
+        asio::connect(socket_, endpoints, error);
 
-        if (connect_error && connect_error != asio::error::would_block) {
-            std::cout << "not connected" << std::endl;
-            return;
-        }
+        if (error && error != asio::error::would_block)
+            return false;
 
-        if (socket_.is_open()) {
-            std::cout << "connected" << std::endl;
-        } else {
-            std::cout << "not connected" << std::endl;
-        }
+        return socket_.is_open();
     }
 
-    void receive()
+    std::optional<std::vector<uint8_t>> receive()
     {
-        auto receive_result = message_buffer_.receive(socket_);
-        std::cout << "receive: " << receive_result.has_value() << std::endl;
-
-        if (receive_result) {
-            int n;
-            memcpy(&n, receive_result.value().data(), 4);
-            std::cout << "n: " << n << std::endl;
-        }
+        return message_buffer_.receive(socket_);
     }
 
 private:

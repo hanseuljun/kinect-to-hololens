@@ -5,7 +5,7 @@
 // This algorithm comes from
 // Wilson, A. D. (2017, October). Fast lossless depth image compression.
 // In Proceedings of the 2017 ACM International Conference on Interactive Surfaces and Spaces (pp. 100-105). ACM.
-namespace rgbd_streamer
+namespace kh
 {
 namespace rvl
 {

@@ -5,7 +5,7 @@
 #include <vpx/vpx_codec.h>
 #include "frames.h"
 
-namespace rgbd_streamer
+namespace kh
 {
 class ColorEncoder
 {

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <libavformat/avformat.h>
 
-namespace rgbd_streamer
+namespace kh
 {
 ColorDecoder::ColorDecoder(AVPacket* packet, AVCodec* codec,
     AVCodecParserContext* codec_parser_context,

@@ -2,11 +2,11 @@
 
 #include <vector>
 
-namespace rgbd_streamer
+namespace kh
 {
 namespace rvl
 {
-namespace internal
+namespace wilson
 {
 void EncodeVLE(int value, int*& pBuffer, int& word, int& nibblesWritten)
 {
@@ -94,12 +94,12 @@ void DecompressRVL(char* input, short* output, int numPixels)
         }
     }
 }
-} // end of namespace internal
+} // end of namespace wilson
 
 std::vector<uint8_t> compress(uint16_t* depth_frame, int num_pixels)
 {
     std::vector<uint8_t> output(num_pixels);
-    int size = internal::CompressRVL(reinterpret_cast<short*>(depth_frame), reinterpret_cast<char*>(output.data()), num_pixels);
+    int size = wilson::CompressRVL(reinterpret_cast<short*>(depth_frame), reinterpret_cast<char*>(output.data()), num_pixels);
     // This is theoretically possible to happen; however, almost does not happen with input from a Kinect.
     if (size > num_pixels)
         throw std::exception("not enough buffer size in compress in rvl::compress");
@@ -111,7 +111,7 @@ std::vector<uint8_t> compress(uint16_t* depth_frame, int num_pixels)
 std::vector<uint16_t> decompress(uint8_t* rvl_frame, int num_pixels)
 {
     std::vector<uint16_t> output(num_pixels);
-    internal::DecompressRVL(reinterpret_cast<char*>(rvl_frame), reinterpret_cast<short*>(output.data()), num_pixels);
+    wilson::DecompressRVL(reinterpret_cast<char*>(rvl_frame), reinterpret_cast<short*>(output.data()), num_pixels);
     return output;
 }
 
@@ -125,17 +125,17 @@ void decompress(uint8_t* input, uint16_t* output, int width, int height, int row
     int numPixelsToDecode = width * height;
     int row = 0;
     while (numPixelsToDecode) {
-        int zeros = internal::DecodeVLE(pBuffer, word, nibblesWritten); // number of zeros
+        int zeros = wilson::DecodeVLE(pBuffer, word, nibblesWritten); // number of zeros
         numPixelsToDecode -= zeros;
         for (; zeros; zeros--) {
             *output++ = 0;
             if (++row == width)
                 output += row_pitch - width;
         }
-        int nonzeros = internal::DecodeVLE(pBuffer, word, nibblesWritten); // number of nonzeros
+        int nonzeros = wilson::DecodeVLE(pBuffer, word, nibblesWritten); // number of nonzeros
         numPixelsToDecode -= nonzeros;
         for (; nonzeros; nonzeros--) {
-            int positive = internal::DecodeVLE(pBuffer, word, nibblesWritten); // nonzero value
+            int positive = wilson::DecodeVLE(pBuffer, word, nibblesWritten); // nonzero value
             int delta = (positive >> 1) ^ -(positive & 1);
             current = previous + delta;
             *output++ = current;

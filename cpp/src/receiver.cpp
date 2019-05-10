@@ -1,6 +1,6 @@
 #include "receiver.h"
 
-namespace rgbd_streamer
+namespace kh
 {
 MessageBuffer::MessageBuffer()
     : size_bytes_(4)
@@ -19,8 +19,8 @@ std::optional<std::vector<uint8_t>> MessageBuffer::receive(asio::ip::tcp::socket
         std::error_code error_code;
         int packet_size_result = socket.receive(asio::buffer(size_bytes_.data() + size_cursor_, size_bytes_.size() - size_cursor_), 0, error_code);
         if (error_code && error_code != asio::error::would_block) {
-            std::cout << "error_code: " << error_code << std::endl;
-            throw std::exception("error in MessageBuffer::receivePacket1");
+            auto error_message = std::string("Error receiving packet size: ") + std::to_string(error_code.value());
+            throw std::exception(error_message.c_str());
         } else {
             size_cursor_ += packet_size_result;
         }
@@ -37,8 +37,8 @@ std::optional<std::vector<uint8_t>> MessageBuffer::receive(asio::ip::tcp::socket
     std::error_code error_code;
     int packet_result = socket.receive(asio::buffer(message_bytes_.data() + message_cursor_, message_bytes_.size() - message_cursor_), 0, error_code);
     if (error_code && error_code != asio::error::would_block) {
-        std::cout << "error_code: " << error_code << std::endl;
-        throw std::exception("error in MessageBuffer::receivePacket2");
+        auto error_message = std::string("Error receiving packet: ") + std::to_string(error_code.value());
+        throw std::exception(error_message.c_str());
     } else {
         message_cursor_ += packet_result;
     }

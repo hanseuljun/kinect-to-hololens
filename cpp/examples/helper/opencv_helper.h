@@ -3,7 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include "frames.h"
 
-namespace rgbd_streamer
+namespace kh
 {
 cv::Mat convertYuvFrameToCvMat(YuvFrame& yuv_frame)
 {

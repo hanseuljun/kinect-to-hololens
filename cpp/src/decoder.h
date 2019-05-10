@@ -5,7 +5,7 @@
 
 #include "frames.h"
 
-namespace rgbd_streamer
+namespace kh
 {
 class ColorDecoder
 {

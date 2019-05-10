@@ -16,11 +16,11 @@ set(SOURCE_FILES
   receiver.cpp
 )
 
-add_library(RgbdStreamerLib ${SOURCE_FILES})
+add_library(KinectToHololensLib ${SOURCE_FILES})
 
-target_link_libraries(RgbdStreamerLib
+target_link_libraries(KinectToHololensLib
   ${FFMPEG_LIBRARIES}
 )
-set_target_properties(RgbdStreamerLib PROPERTIES
+set_target_properties(KinectToHololensLib PROPERTIES
   CXX_STANDARD 17
 )

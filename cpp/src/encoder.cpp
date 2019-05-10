@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace rgbd_streamer
+namespace kh
 {
 ColorEncoder::ColorEncoder(vpx_codec_ctx_t codec, vpx_image_t image)
     : codec_(codec), image_(image), keyframe_interval_(30), frame_index_(0)

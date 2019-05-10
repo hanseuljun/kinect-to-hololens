@@ -3,7 +3,7 @@
 #include <iostream>
 #include <asio.hpp>
 
-namespace rgbd_streamer
+namespace kh
 {
 class Sender
 {
@@ -31,21 +31,50 @@ public:
         return accepted_;
     }
 
-    int send(int n)
+    void send(int frame_id, std::vector<uint8_t>& encoder_frame, std::vector<uint8_t> rvl_frame)
     {
-        int buffer_size = 8;
+        int32_t packet_size = 1 + 4 + 4 + encoder_frame.size() + 4 + rvl_frame.size();
+        int32_t buffer_size = 4 + packet_size;
+
         std::vector<uint8_t> buffer(buffer_size);
-        int int_size = 4;
-        memcpy(buffer.data(), &int_size, 4);
-        memcpy(buffer.data() + 4, &n, 4);
+        size_t cursor = 0;
+
+        memcpy(buffer.data() + cursor, &packet_size, 4);
+        cursor += 4;
+
+        buffer[4] = static_cast<uint8_t>(1);
+        cursor += 1;
+        
+        memcpy(buffer.data() + cursor, &frame_id, 4);
+        cursor += 4;
+
+        int encoder_frame_size = encoder_frame.size();
+        memcpy(buffer.data() + cursor, &encoder_frame_size, 4);
+        cursor += 4;
+        
+        memcpy(buffer.data() + cursor, encoder_frame.data(), encoder_frame.size());
+        cursor += encoder_frame.size();
+
+        int rvl_frame_size = rvl_frame.size();
+        memcpy(buffer.data() + cursor, &rvl_frame_size, 4);
+        cursor += 4;
+
+        memcpy(buffer.data() + cursor, rvl_frame.data(), rvl_frame.size());
+        cursor += rvl_frame.size();
 
         std::error_code error_code;
-        int size = socket_.send(asio::buffer(buffer.data(), buffer_size), 0, error_code);
 
-        if (error_code && (error_code != asio::error::would_block))
-            throw std::exception("server error");
-
-        return size;
+        // Bytes can not be sent. It usually happens due to congestion.
+        // The current solution is to try until the bytes get sent.
+        for (;;) {
+            int size = socket_.send(asio::buffer(buffer.data(), buffer_size), 0, error_code);
+            if (size == buffer_size)
+                break;
+            if (error_code && (error_code != asio::error::would_block))
+                throw std::exception("Server error");
+            if (size != 0)
+                throw std::exception("Sender partially sent the buffer...");
+        }
     }
 
 private:
