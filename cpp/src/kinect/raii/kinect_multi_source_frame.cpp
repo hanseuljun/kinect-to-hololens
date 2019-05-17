@@ -43,19 +43,6 @@ std::unique_ptr<KinectDepthFrame> KinectMultiSourceFrame::getDepthFrame()
 
     return std::make_unique<KinectDepthFrame>(depth_frame);
 }
-
-std::unique_ptr<KinectBodyFrame> KinectMultiSourceFrame::getBodyFrame()
-{
-    IBodyFrameReference* body_frame_reference = nullptr;
-    if (FAILED(multi_source_frame_->get_BodyFrameReference(&body_frame_reference)))
-        return nullptr;
-
-    IBodyFrame* body_frame = nullptr;
-    if (FAILED(body_frame_reference->AcquireFrame(&body_frame)))
-        return nullptr;
-
-    return std::make_unique<KinectBodyFrame>(body_frame);
-}
 }
 }
 }

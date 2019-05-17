@@ -7,20 +7,19 @@ set(SOURCE_FILES
   frames.cpp
   rvl.h
   rvl.cpp
-  encoder.h
-  encoder.cpp
-  decoder.h
-  decoder.cpp
+  vp8.h
+  vp8_encoder.cpp
+  vp8_decoder.cpp
   sender.h
   receiver.h
   receiver.cpp
 )
 
-add_library(KinectToHololensLib ${SOURCE_FILES})
+add_library(KinectToHololens ${SOURCE_FILES})
 
-target_link_libraries(KinectToHololensLib
+target_link_libraries(KinectToHololens
   ${FFMPEG_LIBRARIES}
 )
-set_target_properties(KinectToHololensLib PROPERTIES
+set_target_properties(KinectToHololens PROPERTIES
   CXX_STANDARD 17
 )

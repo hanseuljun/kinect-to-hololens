@@ -7,8 +7,6 @@ set(SOURCE_FILES
   raii/kinect_color_camera_settings.cpp
   raii/kinect_color_frame.cpp
   raii/kinect_depth_frame.cpp
-  raii/kinect_body.cpp
-  raii/kinect_body_frame.cpp
   raii/kinect_multi_source_frame.cpp
   raii/kinect_multi_source_frame_reader.cpp
   raii/kinect_sensor.cpp

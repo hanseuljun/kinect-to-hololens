@@ -1,7 +1,6 @@
 #include <iostream>
 #include "helper/opencv_helper.h"
-#include "encoder.h"
-#include "decoder.h"
+#include "vp8.h"
 #include "kinect/kinect.h"
 
 namespace kh
@@ -33,7 +32,7 @@ void display_frames()
     cv::namedWindow(depth_name, 1);
 
     for (;;) {
-        auto kinect_frame = device->getFrame();
+        auto kinect_frame = device->acquireFrame();
         if (!kinect_frame)
             continue;
 
@@ -65,7 +64,7 @@ void display_frames_with_encoding()
     Vp8Decoder decoder;
 
     for (;;) {
-        auto kinect_frame = device->getFrame();
+        auto kinect_frame = device->acquireFrame();
         if (!kinect_frame)
             continue;
 

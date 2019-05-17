@@ -12,21 +12,17 @@ class KinectFrame
 {
 public:
     KinectFrame(std::unique_ptr<raii::KinectColorFrame> color_frame,
-        std::unique_ptr<raii::KinectDepthFrame> depth_frame,
-        std::unique_ptr<raii::KinectBodyFrame> body_frame)
+        std::unique_ptr<raii::KinectDepthFrame> depth_frame)
         : color_frame_(std::move(color_frame))
         , depth_frame_(std::move(depth_frame))
-        , body_frame_(std::move(body_frame))
     {
     }
     raii::KinectColorFrame* color_frame() { return color_frame_.get(); }
     raii::KinectDepthFrame* depth_frame() { return depth_frame_.get(); }
-    raii::KinectBodyFrame* body_frame() { return body_frame_.get(); }
 
 private:
     std::unique_ptr<raii::KinectColorFrame> color_frame_;
     std::unique_ptr<raii::KinectDepthFrame> depth_frame_;
-    std::unique_ptr<raii::KinectBodyFrame> body_frame_;
 };
 
 class KinectDevice
@@ -35,7 +31,7 @@ public:
     KinectDevice(std::unique_ptr<raii::KinectSensor> sensor,
         std::unique_ptr<raii::KinectMultiSourceFrameReader> frame_reader);
     bool isAvailable();
-    std::unique_ptr<KinectFrame> KinectDevice::getFrame();
+    std::unique_ptr<KinectFrame> KinectDevice::acquireFrame();
 
 private:
     std::unique_ptr<raii::KinectSensor> sensor_;

@@ -4,7 +4,7 @@
 #include "kinect/kinect.h"
 #include "sender.h"
 #include "frames.h"
-#include "encoder.h"
+#include "vp8.h"
 
 namespace kh
 {
@@ -17,6 +17,9 @@ void send_frames()
         std::cout << "Could not find a kinect." << std::endl;
         return;
     }
+
+
+    auto intrinsics = kinect::obtainKinectIntrinsics();
 
     Vp8Encoder encoder(960, 540, 2000);
 
@@ -35,7 +38,7 @@ void send_frames()
         if (!sender.accepted())
             continue;
 
-        auto kinect_frame = device->getFrame();
+        auto kinect_frame = device->acquireFrame();
         if (!kinect_frame)
             continue;
 

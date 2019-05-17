@@ -51,7 +51,7 @@ bool KinectSensor::isAvailable()
 std::unique_ptr<KinectMultiSourceFrameReader> KinectSensor::getMultiSourceFrameReader()
 {
     IMultiSourceFrameReader* multi_source_frame_reader = nullptr;
-    DWORD frame_source_types = FrameSourceTypes_Color | FrameSourceTypes_Depth | FrameSourceTypes_Body;
+    DWORD frame_source_types = FrameSourceTypes_Color | FrameSourceTypes_Depth;
     if (FAILED((kinect_sensor_)->OpenMultiSourceFrameReader(frame_source_types, &multi_source_frame_reader))) {
         std::cout << "KinectSensor::getMultiSourceFrameReader failed..." << std::endl;
         return nullptr;

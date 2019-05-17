@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(kinect-to-hololens)
+project(KinectToHololens)
 
 # For asio. (reference: https://github.com/chriskohlhoff/asio/issues/290)
 add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)

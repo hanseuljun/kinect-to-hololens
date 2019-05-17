@@ -1,7 +1,7 @@
 #include <iostream>
 #include <asio.hpp>
 #include "receiver.h"
-#include "decoder.h"
+#include "vp8.h"
 #include "helper/opencv_helper.h"
 
 namespace kh

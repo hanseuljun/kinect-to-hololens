@@ -50,34 +50,6 @@ private:
     IDepthFrame* depth_frame_;
 };
 
-class KinectBody
-{
-public:
-    KinectBody(IBody* body);
-    ~KinectBody();
-    KinectBody(const KinectBody& other) = delete;
-    KinectBody& operator=(const KinectBody& other) = delete;
-    bool isTracked();
-    Joint getHeadJoint();
-
-private:
-    IBody* body_;
-};
-
-class KinectBodyFrame
-{
-public:
-    KinectBodyFrame(IBodyFrame* body_frame);
-    ~KinectBodyFrame();
-    KinectBodyFrame(const KinectBodyFrame& other) = delete;
-    KinectBodyFrame& operator=(const KinectBodyFrame& other) = delete;
-    std::vector<Joint> getHeadJoints();
-    Vector4 getFloorClipPlane();
-
-private:
-    IBodyFrame* body_frame_;
-};
-
 class KinectMultiSourceFrame
 {
 public:
@@ -87,7 +59,6 @@ public:
     KinectMultiSourceFrame& operator=(const KinectMultiSourceFrame& other) = delete;
     std::unique_ptr<KinectColorFrame> getColorFrame();
     std::unique_ptr<KinectDepthFrame> getDepthFrame();
-    std::unique_ptr<KinectBodyFrame> getBodyFrame();
 
 private:
     IMultiSourceFrame* multi_source_frame_;

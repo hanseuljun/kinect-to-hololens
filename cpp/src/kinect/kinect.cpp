@@ -17,7 +17,7 @@ bool KinectDevice::isAvailable()
     return sensor_->isAvailable();
 }
 
-std::unique_ptr<KinectFrame> KinectDevice::getFrame()
+std::unique_ptr<KinectFrame> KinectDevice::acquireFrame()
 {
     auto multi_source_frame = frame_reader_->getMultiSourceFrame();
     // This can mean Kinect having a problem, or simply not having a new frame yet.
@@ -37,14 +37,8 @@ std::unique_ptr<KinectFrame> KinectDevice::getFrame()
         return nullptr;
     }
 
-    auto body_frame = multi_source_frame->getBodyFrame();
-    if (!body_frame) {
-        std::cout << "body_frame not found in KinectDevice::getFrame..." << std::endl;
-        return nullptr;
-    }
-
     return std::make_unique<KinectFrame>(
-        std::move(color_frame), std::move(depth_frame), std::move(body_frame));
+        std::move(color_frame), std::move(depth_frame));
 }
 
 std::unique_ptr<KinectDevice> obtainKinectDevice()

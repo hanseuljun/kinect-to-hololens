@@ -9,7 +9,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   )
   target_link_libraries(KinectReaderDemo
     ${OpenCV_LIBS}
-    KinectToHololensLib
+    KinectToHololens
     Kinect
     ${Libvpx_LIB}
   )
@@ -41,7 +41,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     "${LIBFREENECT2_DIR}/include"
   )
   target_link_libraries(KinectSenderDemo
-    KinectToHololensLib
+    KinectToHololens
     Kinect
     ${Libvpx_LIB}
   )
@@ -70,7 +70,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   )
   target_link_libraries(KinectReceiverDemo
     ${OpenCV_LIBS}
-    KinectToHololensLib
+    KinectToHololens
   )
   set_target_properties(KinectReceiverDemo PROPERTIES
     CXX_STANDARD 17

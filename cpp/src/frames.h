@@ -87,7 +87,6 @@ private:
     AVFrame* av_frame_;
 };
 
-YuvImage createYuvFrameFromKinectColorBuffer(uint8_t* buffer);
 // Downsample width and height by 2.
 YuvImage createHalfSizedYuvImageFromKinectColorBuffer(uint8_t* buffer);
 YuvImage createYuvImageFromAvFrame(AVFrame* av_frame);
