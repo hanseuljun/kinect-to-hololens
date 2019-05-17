@@ -36,13 +36,13 @@ void _receive_frames(std::string ip_address, int port)
                 memcpy(&frame_id, receive_result->data() + cursor, 4);
                 cursor += 4;
 
-                int encoder_frame_size;
-                memcpy(&encoder_frame_size, receive_result->data() + cursor, 4);
+                int vp8_frame_size;
+                memcpy(&vp8_frame_size, receive_result->data() + cursor, 4);
                 cursor += 4;
 
-                std::vector<uint8_t> encoder_frame(encoder_frame_size);
-                memcpy(encoder_frame.data(), receive_result->data() + cursor, encoder_frame_size);
-                cursor += encoder_frame_size;
+                std::vector<uint8_t> vp8_frame(vp8_frame_size);
+                memcpy(vp8_frame.data(), receive_result->data() + cursor, vp8_frame_size);
+                cursor += vp8_frame_size;
 
                 int rvl_frame_size;
                 memcpy(&rvl_frame_size, receive_result->data() + cursor, 4);
@@ -55,7 +55,7 @@ void _receive_frames(std::string ip_address, int port)
                 if (frame_id % 100 == 0)
                     std::cout << "Received frame " << frame_id << "." << std::endl;
 
-                auto decoder_frame = decoder.decode(encoder_frame);
+                auto decoder_frame = decoder.decode(vp8_frame);
                 auto color_mat = createCvMatFromYuvImage(createYuvImageFromAvFrame(decoder_frame.av_frame()));
 
                 auto depth_frame = createDepthFrameFromRvlFrame(rvl_frame.data());

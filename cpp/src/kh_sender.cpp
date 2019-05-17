@@ -35,9 +35,9 @@ void Sender::send(kinect::KinectIntrinsics intrinsics)
     _send(buffer);
 }
 
-void Sender::send(int frame_id, std::vector<uint8_t>& encoder_frame, std::vector<uint8_t> rvl_frame)
+void Sender::send(int frame_id, std::vector<uint8_t>& vp8_frame, std::vector<uint8_t> rvl_frame)
 {
-    uint32_t message_size = static_cast<uint32_t>(1 + 4 + 4 + encoder_frame.size() + 4 + rvl_frame.size());
+    uint32_t message_size = static_cast<uint32_t>(1 + 4 + 4 + vp8_frame.size() + 4 + rvl_frame.size());
     uint32_t buffer_size = static_cast<uint32_t>(4 + message_size);
 
     std::vector<uint8_t> buffer(buffer_size);
@@ -53,12 +53,12 @@ void Sender::send(int frame_id, std::vector<uint8_t>& encoder_frame, std::vector
     memcpy(buffer.data() + cursor, &frame_id, 4);
     cursor += 4;
 
-    auto encoder_frame_size = static_cast<uint32_t>(encoder_frame.size());
+    auto encoder_frame_size = static_cast<uint32_t>(vp8_frame.size());
     memcpy(buffer.data() + cursor, &encoder_frame_size, 4);
     cursor += 4;
 
-    memcpy(buffer.data() + cursor, encoder_frame.data(), encoder_frame.size());
-    cursor += encoder_frame.size();
+    memcpy(buffer.data() + cursor, vp8_frame.data(), vp8_frame.size());
+    cursor += vp8_frame.size();
 
     auto rvl_frame_size = static_cast<uint32_t>(rvl_frame.size());
     memcpy(buffer.data() + cursor, &rvl_frame_size, 4);

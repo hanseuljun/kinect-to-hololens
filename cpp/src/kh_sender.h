@@ -11,7 +11,7 @@ class Sender
 public:
     Sender(asio::ip::tcp::socket&& socket);
     void send(kinect::KinectIntrinsics intrinsics);
-    void send(int frame_id, std::vector<uint8_t>& encoder_frame, std::vector<uint8_t> rvl_frame);
+    void send(int frame_id, std::vector<uint8_t>& vp8_frame, std::vector<uint8_t> rvl_frame);
 private:
     void _send(std::vector<uint8_t>& buffer);
 

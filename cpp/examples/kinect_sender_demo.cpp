@@ -46,7 +46,7 @@ void _send_frames(int port)
             continue;
 
         auto yuv_image = createHalfSizedYuvImageFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
-        auto encoder_frame = encoder.encode(yuv_image);
+        auto vp8_frame = encoder.encode(yuv_image);
 
         auto rvl_frame = createRvlFrameFromKinectDepthBuffer(kinect_frame->depth_frame()->getUnderlyingBuffer());
 
@@ -54,7 +54,7 @@ void _send_frames(int port)
             std::cout << "Sending frame " << frame_id << "." << std::endl;
 
         try {
-            sender.send(frame_id++, encoder_frame, rvl_frame);
+            sender.send(frame_id++, vp8_frame, rvl_frame);
         } catch (std::exception& e) {
             std::cout << e.what() << std::endl;
             break;
