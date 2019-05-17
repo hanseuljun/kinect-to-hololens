@@ -56,26 +56,26 @@ private:
     int height_;
 };
 
-class ColorDecoderFrame
+class FFmpegFrame
 {
 public:
-    ColorDecoderFrame(AVFrame* av_frame)
+    FFmpegFrame(AVFrame* av_frame)
         : av_frame_(av_frame)
     {
     }
-    ~ColorDecoderFrame()
+    ~FFmpegFrame()
     {
         if (av_frame_)
             av_frame_free(&av_frame_);
     }
-    ColorDecoderFrame(const ColorDecoderFrame& other) = delete;
-    ColorDecoderFrame& operator=(const ColorDecoderFrame& other) = delete;
-    ColorDecoderFrame(ColorDecoderFrame&& other) noexcept
+    FFmpegFrame(const FFmpegFrame& other) = delete;
+    FFmpegFrame& operator=(const FFmpegFrame& other) = delete;
+    FFmpegFrame(FFmpegFrame&& other) noexcept
         : av_frame_(other.av_frame_)
     {
         other.av_frame_ = nullptr;
     }
-    ColorDecoderFrame& operator=(ColorDecoderFrame&& other) noexcept
+    FFmpegFrame& operator=(FFmpegFrame&& other) noexcept
     {
         av_frame_ = other.av_frame_;
         other.av_frame_ = nullptr;
@@ -88,8 +88,8 @@ private:
 };
 
 // Downsample width and height by 2.
-YuvImage createHalfSizedYuvImageFromKinectColorBuffer(uint8_t* buffer);
+YuvImage createHalvedYuvImageFromKinectColorBuffer(uint8_t* buffer);
 YuvImage createYuvImageFromAvFrame(AVFrame* av_frame);
 std::vector<uint8_t> createRvlFrameFromKinectDepthBuffer(uint16_t* buffer);
-std::vector<uint16_t> createDepthFrameFromRvlFrame(uint8_t* rvl_frame);
+std::vector<uint16_t> createDepthImageFromRvlFrame(uint8_t* rvl_frame);
 }

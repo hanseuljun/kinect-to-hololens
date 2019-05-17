@@ -44,7 +44,7 @@ Vp8Decoder::~Vp8Decoder()
         avcodec_free_context(&codec_context_);
 }
 
-void decodePacket(std::vector<ColorDecoderFrame>& decoder_frames, AVCodecContext* codec_context, AVPacket* pkt)
+void decodePacket(std::vector<FFmpegFrame>& decoder_frames, AVCodecContext* codec_context, AVPacket* pkt)
 {
     if (avcodec_send_packet(codec_context, pkt) < 0)
         throw std::exception("Error from avcodec_send_packet.");
@@ -70,9 +70,9 @@ void decodePacket(std::vector<ColorDecoderFrame>& decoder_frames, AVCodecContext
     return;
 }
 
-ColorDecoderFrame Vp8Decoder::decode(const std::vector<uint8_t>& av_frame)
+FFmpegFrame Vp8Decoder::decode(const std::vector<uint8_t>& av_frame)
 {
-    std::vector<ColorDecoderFrame> decoder_frames;
+    std::vector<FFmpegFrame> decoder_frames;
     /* use the parser to split the data into frames */
     size_t data_size = av_frame.size();
     // Adding buffer padding is important!

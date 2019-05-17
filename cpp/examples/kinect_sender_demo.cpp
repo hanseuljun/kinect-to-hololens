@@ -45,7 +45,7 @@ void _send_frames(int port)
         if (!kinect_frame)
             continue;
 
-        auto yuv_image = createHalfSizedYuvImageFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
+        auto yuv_image = createHalvedYuvImageFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
         auto vp8_frame = encoder.encode(yuv_image);
 
         auto rvl_frame = createRvlFrameFromKinectDepthBuffer(kinect_frame->depth_frame()->getUnderlyingBuffer());

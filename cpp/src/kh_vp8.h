@@ -11,7 +11,7 @@ class Vp8Decoder
 public:
     Vp8Decoder();
     ~Vp8Decoder();
-    ColorDecoderFrame decode(const std::vector<uint8_t>& av_frame);
+    FFmpegFrame decode(const std::vector<uint8_t>& av_frame);
 
 private:
     AVPacket* packet_;

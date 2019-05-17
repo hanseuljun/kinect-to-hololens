@@ -29,7 +29,7 @@ cv::Mat createCvMatFromYuvImage(YuvImage& yuv_frame)
     return bgr_frame;
 }
 
-cv::Mat createCvMatFromKinectDepthBuffer(const uint16_t* depth_buffer)
+cv::Mat createCvMatFromKinectDepthImage(const uint16_t* depth_buffer)
 {
     const int WIDTH = 512;
     const int HEIGHT = 424;

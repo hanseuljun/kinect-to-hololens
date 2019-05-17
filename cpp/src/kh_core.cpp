@@ -5,7 +5,7 @@
 namespace kh
 {
 // Downsample width and height by 2.
-YuvImage createHalfSizedYuvImageFromKinectColorBuffer(uint8_t* buffer)
+YuvImage createHalvedYuvImageFromKinectColorBuffer(uint8_t* buffer)
 {
     // The width and height of Kinect's color frames.
     const int WIDTH = 1920;
@@ -75,7 +75,7 @@ std::vector<uint8_t> createRvlFrameFromKinectDepthBuffer(uint16_t* buffer)
     return rvl::compress(buffer, WIDTH * HEIGHT);
 }
 
-std::vector<uint16_t> createDepthFrameFromRvlFrame(uint8_t* rvl_frame)
+std::vector<uint16_t> createDepthImageFromRvlFrame(uint8_t* rvl_frame)
 {
     // The width and height of Kinect's depth frames.
     const int WIDTH = 512;

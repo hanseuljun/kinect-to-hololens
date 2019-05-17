@@ -55,11 +55,11 @@ void _receive_frames(std::string ip_address, int port)
                 if (frame_id % 100 == 0)
                     std::cout << "Received frame " << frame_id << "." << std::endl;
 
-                auto decoder_frame = decoder.decode(vp8_frame);
-                auto color_mat = createCvMatFromYuvImage(createYuvImageFromAvFrame(decoder_frame.av_frame()));
+                auto ffmpeg_frame = decoder.decode(vp8_frame);
+                auto color_mat = createCvMatFromYuvImage(createYuvImageFromAvFrame(ffmpeg_frame.av_frame()));
 
-                auto depth_frame = createDepthFrameFromRvlFrame(rvl_frame.data());
-                auto depth_mat = createCvMatFromKinectDepthBuffer(depth_frame.data());
+                auto depth_image = createDepthImageFromRvlFrame(rvl_frame.data());
+                auto depth_mat = createCvMatFromKinectDepthImage(depth_image.data());
 
                 cv::imshow("Color", color_mat);
                 cv::imshow("Depth", depth_mat);

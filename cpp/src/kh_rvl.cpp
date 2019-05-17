@@ -2,10 +2,8 @@
 
 #include <vector>
 
-namespace kh
-{
-namespace rvl
-{
+// Code inside namespace wilson is from the RVL paper (Wilson, 2017).
+// The code has been modified to be thread-safe.
 namespace wilson
 {
 void EncodeVLE(int value, int*& pBuffer, int& word, int& nibblesWritten)
@@ -96,22 +94,27 @@ void DecompressRVL(char* input, short* output, int numPixels)
 }
 } // end of namespace wilson
 
-std::vector<uint8_t> compress(uint16_t* depth_frame, int num_pixels)
+namespace kh
+{
+namespace rvl
+{
+std::vector<uint8_t> compress(uint16_t* input, int num_pixels)
 {
     std::vector<uint8_t> output(num_pixels);
-    int size = wilson::CompressRVL(reinterpret_cast<short*>(depth_frame), reinterpret_cast<char*>(output.data()), num_pixels);
-    // This is theoretically possible to happen; however, almost does not happen with input from a Kinect.
+    int size = wilson::CompressRVL(reinterpret_cast<short*>(input), reinterpret_cast<char*>(output.data()), num_pixels);
+    // This is theoretically possible to happen since lossless compression does not guarantee reduction of size.
+    // However, it is very unlikely to happen.
     if (size > num_pixels)
-        throw std::exception("not enough buffer size in compress in rvl::compress");
+        throw std::exception("RVL compression failed to reduce the size of its input.");
     output.resize(size);
     output.shrink_to_fit();
     return output;
 }
 
-std::vector<uint16_t> decompress(uint8_t* rvl_frame, int num_pixels)
+std::vector<uint16_t> decompress(uint8_t* input, int num_pixels)
 {
     std::vector<uint16_t> output(num_pixels);
-    wilson::DecompressRVL(reinterpret_cast<char*>(rvl_frame), reinterpret_cast<short*>(output.data()), num_pixels);
+    wilson::DecompressRVL(reinterpret_cast<char*>(input), reinterpret_cast<short*>(output.data()), num_pixels);
     return output;
 }
 
