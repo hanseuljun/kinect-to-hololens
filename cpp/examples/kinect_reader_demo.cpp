@@ -37,10 +37,10 @@ void display_frames()
         if (!kinect_frame)
             continue;
 
-        auto yuv_frame = createHalfSizedYuvFrameFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
-        auto color_mat = convertYuvFrameToCvMat(yuv_frame);
+        auto yuv_frame = createHalfSizedYuvImageFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
+        auto color_mat = createCvMatFromYuvImage(yuv_frame);
 
-        auto depth_mat = convertKinectDepthBufferToCvMat(kinect_frame->depth_frame()->getUnderlyingBuffer());
+        auto depth_mat = createCvMatFromKinectDepthBuffer(kinect_frame->depth_frame()->getUnderlyingBuffer());
 
         cv::imshow(color_name, color_mat);
         cv::imshow(depth_name, depth_mat);
@@ -61,22 +61,22 @@ void display_frames_with_encoding()
     auto color_name = "kinect color frame";
     auto depth_name = "kinect depth frame";
 
-    auto encoder = createColorEncoder(960, 540, 2000);
-    auto decoder = createColorDecoder();
+    Vp8Encoder encoder(960, 540, 2000);
+    Vp8Decoder decoder;
 
     for (;;) {
         auto kinect_frame = device->getFrame();
         if (!kinect_frame)
             continue;
 
-        auto yuv_frame = createHalfSizedYuvFrameFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
-        auto encoder_frame = encoder->encode(yuv_frame);
-        auto decoder_frame = decoder->decode(encoder_frame);
-        auto color_mat = convertYuvFrameToCvMat(createYuvFrameFromAvFrame(decoder_frame.av_frame()));
+        auto yuv_image = createHalfSizedYuvImageFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
+        auto encoder_frame = encoder.encode(yuv_image);
+        auto decoder_frame = decoder.decode(encoder_frame);
+        auto color_mat = createCvMatFromYuvImage(createYuvImageFromAvFrame(decoder_frame.av_frame()));
 
         auto rvl_frame = createRvlFrameFromKinectDepthBuffer(kinect_frame->depth_frame()->getUnderlyingBuffer());
         auto depth_frame = createDepthFrameFromRvlFrame(rvl_frame.data());
-        auto depth_mat = convertKinectDepthBufferToCvMat(depth_frame.data());
+        auto depth_mat = createCvMatFromKinectDepthBuffer(depth_frame.data());
 
         cv::imshow(color_name, color_mat);
         cv::imshow(depth_name, depth_mat);
@@ -91,7 +91,6 @@ int main()
     //kh::print_intrinsics();
     //kh::display_frames();
     kh::display_frames_with_encoding();
-    //kh::display_textures();
     std::cin.get();
     return 0;
 }

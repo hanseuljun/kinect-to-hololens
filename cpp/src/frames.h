@@ -11,10 +11,10 @@ extern "C"
 namespace kh
 {
 // Data of this class is not supposed to be copy since it will take a lot of computational resource.
-class YuvFrame
+class YuvImage
 {
 public:
-    YuvFrame(std::vector<uint8_t>&& y_channel, std::vector<uint8_t>&& u_channel,
+    YuvImage(std::vector<uint8_t>&& y_channel, std::vector<uint8_t>&& u_channel,
         std::vector<uint8_t>&& v_channel, int width, int height)
         : y_channel_(std::move(y_channel))
         , u_channel_(std::move(u_channel))
@@ -23,9 +23,9 @@ public:
         , height_(height)
     {
     }
-    YuvFrame(const YuvFrame& other) = delete;
-    YuvFrame& operator=(const YuvFrame& other) = delete;
-    YuvFrame(YuvFrame&& other) noexcept
+    YuvImage(const YuvImage& other) = delete;
+    YuvImage& operator=(const YuvImage& other) = delete;
+    YuvImage(YuvImage&& other) noexcept
         : y_channel_(std::move(other.y_channel_))
         , u_channel_(std::move(other.u_channel_))
         , v_channel_(std::move(other.v_channel_))
@@ -33,7 +33,7 @@ public:
         , height_(other.height_)
     {
     }
-    YuvFrame& operator=(YuvFrame&& other) noexcept
+    YuvImage& operator=(YuvImage&& other) noexcept
     {
         y_channel_ = std::move(other.y_channel_);
         u_channel_ = std::move(other.u_channel_);
@@ -87,10 +87,10 @@ private:
     AVFrame* av_frame_;
 };
 
-YuvFrame createYuvFrameFromKinectColorBuffer(uint8_t* buffer);
+YuvImage createYuvFrameFromKinectColorBuffer(uint8_t* buffer);
 // Downsample width and height by 2.
-YuvFrame createHalfSizedYuvFrameFromKinectColorBuffer(uint8_t* buffer);
-YuvFrame createYuvFrameFromAvFrame(AVFrame* av_frame);
+YuvImage createHalfSizedYuvImageFromKinectColorBuffer(uint8_t* buffer);
+YuvImage createYuvImageFromAvFrame(AVFrame* av_frame);
 std::vector<uint8_t> createRvlFrameFromKinectDepthBuffer(uint16_t* buffer);
 std::vector<uint16_t> createDepthFrameFromRvlFrame(uint8_t* rvl_frame);
 }

@@ -33,8 +33,8 @@ public:
 
     void send(int frame_id, std::vector<uint8_t>& encoder_frame, std::vector<uint8_t> rvl_frame)
     {
-        int32_t packet_size = 1 + 4 + 4 + encoder_frame.size() + 4 + rvl_frame.size();
-        int32_t buffer_size = 4 + packet_size;
+        uint32_t packet_size = 1 + 4 + 4 + encoder_frame.size() + 4 + rvl_frame.size();
+        uint32_t buffer_size = 4 + packet_size;
 
         std::vector<uint8_t> buffer(buffer_size);
         size_t cursor = 0;
@@ -48,14 +48,14 @@ public:
         memcpy(buffer.data() + cursor, &frame_id, 4);
         cursor += 4;
 
-        int encoder_frame_size = encoder_frame.size();
+        auto encoder_frame_size = static_cast<uint32_t>(encoder_frame.size());
         memcpy(buffer.data() + cursor, &encoder_frame_size, 4);
         cursor += 4;
         
         memcpy(buffer.data() + cursor, encoder_frame.data(), encoder_frame.size());
         cursor += encoder_frame.size();
 
-        int rvl_frame_size = rvl_frame.size();
+        auto rvl_frame_size = static_cast<uint32_t>(rvl_frame.size());
         memcpy(buffer.data() + cursor, &rvl_frame_size, 4);
         cursor += 4;
 
@@ -64,8 +64,8 @@ public:
 
         std::error_code error_code;
 
-        // Bytes can not be sent. It usually happens due to congestion.
-        // The current solution is to try until the bytes get sent.
+        // Bytes may not be sent. It usually happens due to network congestion.
+        // The current solution is to try again until the bytes get sent.
         for (;;) {
             int size = socket_.send(asio::buffer(buffer.data(), buffer_size), 0, error_code);
             if (size == buffer_size)

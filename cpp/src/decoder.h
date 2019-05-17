@@ -1,19 +1,14 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include "frames.h"
 
 namespace kh
 {
-class ColorDecoder
+class Vp8Decoder
 {
 public:
-    ColorDecoder(AVPacket* packet, AVCodec* codec,
-        AVCodecParserContext* codec_parser_context,
-        AVCodecContext* codec_context);
-    ~ColorDecoder();
+    Vp8Decoder();
+    ~Vp8Decoder();
     ColorDecoderFrame decode(const std::vector<uint8_t>& av_frame);
 
 private:
@@ -22,6 +17,4 @@ private:
     AVCodecParserContext* codec_parser_context_;
     AVCodecContext* codec_context_;
 };
-
-std::unique_ptr<ColorDecoder> createColorDecoder();
 }

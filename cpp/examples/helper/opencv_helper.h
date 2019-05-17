@@ -5,7 +5,7 @@
 
 namespace kh
 {
-cv::Mat convertYuvFrameToCvMat(YuvFrame& yuv_frame)
+cv::Mat createCvMatFromYuvImage(YuvImage& yuv_frame)
 {
     cv::Mat y_channel(yuv_frame.height(), yuv_frame.width(), CV_8UC1, yuv_frame.y_channel().data());
     cv::Mat u_channel(yuv_frame.height() / 2, yuv_frame.width() / 2, CV_8UC1, yuv_frame.u_channel().data());
@@ -29,7 +29,7 @@ cv::Mat convertYuvFrameToCvMat(YuvFrame& yuv_frame)
     return bgr_frame;
 }
 
-cv::Mat convertKinectDepthBufferToCvMat(const uint16_t* depth_buffer)
+cv::Mat createCvMatFromKinectDepthBuffer(const uint16_t* depth_buffer)
 {
     const int WIDTH = 512;
     const int HEIGHT = 424;

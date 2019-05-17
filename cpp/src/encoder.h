@@ -1,18 +1,17 @@
 #pragma once
 
-#include <memory>
 #include <vpx/vp8cx.h>
 #include <vpx/vpx_codec.h>
 #include "frames.h"
 
 namespace kh
 {
-class ColorEncoder
+class Vp8Encoder
 {
 public:
-    ColorEncoder(vpx_codec_ctx_t codec, vpx_image_t image);
-    ~ColorEncoder();
-    std::vector<uint8_t> encode(YuvFrame& av_frame);
+    Vp8Encoder(int width, int height, int target_bitrate);
+    ~Vp8Encoder();
+    std::vector<uint8_t> encode(YuvImage& yuv_image);
 
 private:
     vpx_codec_ctx_t codec_;
@@ -20,6 +19,4 @@ private:
     int keyframe_interval_;
     int frame_index_;
 };
-
-std::unique_ptr<ColorEncoder> createColorEncoder(int width, int height, int target_bitrate);
 }

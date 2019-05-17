@@ -5,17 +5,34 @@
 
 namespace kh
 {
-ColorDecoder::ColorDecoder(AVPacket* packet, AVCodec* codec,
-    AVCodecParserContext* codec_parser_context,
-    AVCodecContext* codec_context)
-    : packet_(packet)
-    , codec_(codec)
-    , codec_parser_context_(codec_parser_context)
-    , codec_context_(codec_context)
+Vp8Decoder::Vp8Decoder()
+    : packet_(nullptr)
+    , codec_(nullptr)
+    , codec_parser_context_(nullptr)
+    , codec_context_(nullptr)
 {
+    packet_ = av_packet_alloc();
+    if (!packet_)
+        throw std::exception("av_packet_alloc failed.");
+
+    codec_ = avcodec_find_decoder(AV_CODEC_ID_VP8);
+    if (!codec_)
+        throw std::exception("avcodec_find_decoder failed.");
+
+    codec_parser_context_ = av_parser_init(codec_->id);
+    if (!codec_parser_context_)
+        throw std::exception("av_parser_init failed.");
+
+    codec_context_ = avcodec_alloc_context3(codec_);
+    if (!codec_context_)
+        throw std::exception("avcodec_alloc_context3 failed.");
+
+    /* open it */
+    if (avcodec_open2(codec_context_, codec_, nullptr) < 0)
+        throw std::exception("avcodec_open2 failed.");
 }
 
-ColorDecoder::~ColorDecoder()
+Vp8Decoder::~Vp8Decoder()
 {
     if (packet_)
         av_packet_free(&packet_);
@@ -53,7 +70,7 @@ void decodePacket(std::vector<ColorDecoderFrame>& decoder_frames, AVCodecContext
     return;
 }
 
-ColorDecoderFrame ColorDecoder::decode(const std::vector<uint8_t>& av_frame)
+ColorDecoderFrame Vp8Decoder::decode(const std::vector<uint8_t>& av_frame)
 {
     std::vector<ColorDecoderFrame> decoder_frames;
     /* use the parser to split the data into frames */
@@ -83,39 +100,9 @@ ColorDecoderFrame ColorDecoder::decode(const std::vector<uint8_t>& av_frame)
     }
 
     if (decoder_frames.size() != 1) {
-        throw std::exception("More or less than a frame found in ColorDecoder::decode.");
+        throw std::exception("More or less than one frame found in ColorDecoder::decode.");
     }
 
     return std::move(decoder_frames[0]);
-}
-
-std::unique_ptr<ColorDecoder> createColorDecoder()
-{
-    av_log_set_level(AV_LOG_INFO);
-    
-    const AVCodecID AV_CODEC_ID = AV_CODEC_ID_VP8;
-
-    auto packet = av_packet_alloc();
-    if (!packet)
-        throw std::exception("av_packet_alloc failed.");
-
-    avcodec_register_all();
-    auto codec = avcodec_find_decoder(AV_CODEC_ID);
-    if (!codec)
-        throw std::exception("avcodec_find_decoder failed.");
-
-    auto codec_parser_context = av_parser_init(codec->id);
-    if (!codec_parser_context)
-        throw std::exception("av_parser_init failed.");
-
-    auto codec_context = avcodec_alloc_context3(codec);
-    if (!codec_context)
-        throw std::exception("avcodec_alloc_context3 failed.");
-
-    /* open it */
-    if (avcodec_open2(codec_context, codec, nullptr) < 0)
-        throw std::exception("avcodec_open2 failed.");
-    
-    return std::make_unique<ColorDecoder>(packet, codec, codec_parser_context, codec_context);
 }
 }

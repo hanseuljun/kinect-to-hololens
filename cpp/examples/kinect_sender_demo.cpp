@@ -18,7 +18,7 @@ void send_frames()
         return;
     }
 
-    auto encoder = createColorEncoder(960, 540, 2000);
+    Vp8Encoder encoder(960, 540, 2000);
 
     asio::io_context io_context;
     Sender sender(io_context, PORT);
@@ -39,8 +39,8 @@ void send_frames()
         if (!kinect_frame)
             continue;
 
-        auto yuv_frame = createHalfSizedYuvFrameFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
-        auto encoder_frame = encoder->encode(yuv_frame);
+        auto yuv_frame = createHalfSizedYuvImageFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
+        auto encoder_frame = encoder.encode(yuv_frame);
 
         auto rvl_frame = createRvlFrameFromKinectDepthBuffer(kinect_frame->depth_frame()->getUnderlyingBuffer());
 

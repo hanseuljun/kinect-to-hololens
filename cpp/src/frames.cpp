@@ -4,38 +4,8 @@
 
 namespace kh
 {
-YuvFrame createYuvFrameFromKinectColorBuffer(uint8_t* buffer)
-{
-    // The width and height of Kinect's color frames.
-    const int WIDTH = 1920;
-    const int HEIGHT = 1080;
-
-    // assumes ColorImageFormat_Yuy2
-    std::vector<uint8_t> y_channel(WIDTH * HEIGHT);
-    std::vector<uint8_t> u_channel(WIDTH * HEIGHT / 4);
-    std::vector<uint8_t> v_channel(WIDTH * HEIGHT / 4);
-
-    for (int i = 0; i < WIDTH * HEIGHT; ++i)
-        y_channel[i] = buffer[i * 2];
-
-    const int uv_width = WIDTH / 2;
-    const int uv_height = HEIGHT / 2;
-    for (int i = 0; i < uv_width; ++i) {
-        for (int j = 0; j < uv_height; ++j) {
-            int ii = i * 2;
-            int jj = j * 2;
-            int uv_index = i + j * (WIDTH / 2);
-            int buffer_index = (ii + WIDTH * jj) * 2 + 1;
-            u_channel[uv_index] = (buffer[buffer_index] + buffer[buffer_index + WIDTH * 2]) / 2;
-            v_channel[uv_index] = (buffer[buffer_index + 1 * 2] + buffer[buffer_index + (1 + WIDTH) * 2]) / 2;
-        }
-    }
-
-    return YuvFrame(std::move(y_channel), std::move(u_channel), std::move(v_channel), WIDTH, HEIGHT);
-}
-
 // Downsample width and height by 2.
-YuvFrame createHalfSizedYuvFrameFromKinectColorBuffer(uint8_t* buffer)
+YuvImage createHalfSizedYuvImageFromKinectColorBuffer(uint8_t* buffer)
 {
     // The width and height of Kinect's color frames.
     const int WIDTH = 1920;
@@ -74,7 +44,7 @@ YuvFrame createHalfSizedYuvFrameFromKinectColorBuffer(uint8_t* buffer)
         }
     }
 
-    return YuvFrame(std::move(y_channel), std::move(u_channel), std::move(v_channel), DOWNSAMPLED_WIDTH, DOWNSAMPLED_HEIGHT);
+    return YuvImage(std::move(y_channel), std::move(u_channel), std::move(v_channel), DOWNSAMPLED_WIDTH, DOWNSAMPLED_HEIGHT);
 }
 
 std::vector<uint8_t> convertPicturePlaneToBytes(uint8_t* data, int line_size, int width, int height)
@@ -86,9 +56,9 @@ std::vector<uint8_t> convertPicturePlaneToBytes(uint8_t* data, int line_size, in
     return bytes;
 }
 
-YuvFrame createYuvFrameFromAvFrame(AVFrame* av_frame)
+YuvImage createYuvImageFromAvFrame(AVFrame* av_frame)
 {
-    return YuvFrame(
+    return YuvImage(
         std::move(convertPicturePlaneToBytes(av_frame->data[0], av_frame->linesize[0], av_frame->width, av_frame->height)),
         std::move(convertPicturePlaneToBytes(av_frame->data[1], av_frame->linesize[1], av_frame->width / 2, av_frame->height / 2)),
         std::move(convertPicturePlaneToBytes(av_frame->data[2], av_frame->linesize[2], av_frame->width / 2, av_frame->height / 2)),
