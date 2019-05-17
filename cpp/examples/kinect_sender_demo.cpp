@@ -9,11 +9,15 @@ void _send_frames(int port)
 {
     std::cout << "Start sending Kinect frames (port: " << port << ")." << std::endl;
 
-    auto intrinsics = kinect::obtainKinectIntrinsics();
-
     auto device = kinect::obtainKinectDevice();
     if (!device) {
-        std::cout << "Could not find a kinect device." << std::endl;
+        std::cout << "Could not find a Kinect." << std::endl;
+        return;
+    }
+
+    auto intrinsics = kinect::obtainKinectIntrinsics();
+    if (!intrinsics) {
+        std::cout << "Could not find intrinsics of a Kinect." << std::endl;
         return;
     }
 
@@ -32,6 +36,8 @@ void _send_frames(int port)
         while (!stopped)
             io_context.run();
     });
+
+    sender.send(*intrinsics);
 
     int frame_id = 0;
     for (;;) {

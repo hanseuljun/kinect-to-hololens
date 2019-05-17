@@ -18,6 +18,10 @@ set(SOURCE_FILES
 
 add_library(KinectToHololens ${SOURCE_FILES})
 
+target_include_directories(KinectToHololens PRIVATE
+  "$ENV{KINECTSDK20_DIR}/inc"
+  "${LIBFREENECT2_DIR}/include"
+)
 target_link_libraries(KinectToHololens
   ${FFMPEG_LIBRARIES}
 )
