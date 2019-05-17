@@ -1,7 +1,7 @@
 #pragma once
 
 #include <opencv2/opencv.hpp>
-#include "frames.h"
+#include "kh_core.h"
 
 namespace kh
 {

@@ -3,16 +3,17 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 set(SOURCE_FILES
-  frames.h
-  frames.cpp
-  rvl.h
-  rvl.cpp
-  vp8.h
-  vp8_encoder.cpp
-  vp8_decoder.cpp
-  sender.h
-  receiver.h
-  receiver.cpp
+  kh_core.h
+  kh_core.cpp
+  kh_vp8.h
+  kh_vp8_encoder.cpp
+  kh_vp8_decoder.cpp
+  kh_rvl.h
+  kh_rvl.cpp
+  kh_sender.h
+  kh_sender.cpp
+  kh_receiver.h
+  kh_receiver.cpp
 )
 
 add_library(KinectToHololens ${SOURCE_FILES})

@@ -2,7 +2,7 @@
 
 #include <vpx/vp8cx.h>
 #include <vpx/vpx_codec.h>
-#include "frames.h"
+#include "kh_core.h"
 
 namespace kh
 {

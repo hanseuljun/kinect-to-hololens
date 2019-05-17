@@ -21,24 +21,18 @@ std::unique_ptr<KinectFrame> KinectDevice::acquireFrame()
 {
     auto multi_source_frame = frame_reader_->getMultiSourceFrame();
     // This can mean Kinect having a problem, or simply not having a new frame yet.
-    if (!multi_source_frame) {
+    if (!multi_source_frame)
         return nullptr;
-    }
 
     auto color_frame = multi_source_frame->getColorFrame();
-    if (!color_frame) {
-        std::cout << "color_frame not found in KinectDevice::getFrame..." << std::endl;
+    if (!color_frame)
         return nullptr;
-    }
 
     auto depth_frame = multi_source_frame->getDepthFrame();
-    if (!depth_frame) {
-        std::cout << "depth_frame not found in KinectDevice::getFrame..." << std::endl;
+    if (!depth_frame)
         return nullptr;
-    }
 
-    return std::make_unique<KinectFrame>(
-        std::move(color_frame), std::move(depth_frame));
+    return std::make_unique<KinectFrame>(std::move(color_frame), std::move(depth_frame));
 }
 
 std::unique_ptr<KinectDevice> obtainKinectDevice()

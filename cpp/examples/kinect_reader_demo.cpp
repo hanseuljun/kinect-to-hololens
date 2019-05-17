@@ -1,6 +1,6 @@
 #include <iostream>
 #include "helper/opencv_helper.h"
-#include "vp8.h"
+#include "kh_vp8.h"
 #include "kinect/kinect.h"
 
 namespace kh
