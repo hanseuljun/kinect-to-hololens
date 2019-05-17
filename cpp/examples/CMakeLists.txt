@@ -64,16 +64,15 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${LIBFREENECT2_DIR}/bin/turbojpeg.dll"
     $<TARGET_FILE_DIR:KinectSenderDemo>
   )
-
-  add_executable(KinectReceiverDemo
-    kinect_receiver_demo.cpp
-  )
-  target_link_libraries(KinectReceiverDemo
-    ${OpenCV_LIBS}
-    KinectToHololens
-  )
-  set_target_properties(KinectReceiverDemo PROPERTIES
-    CXX_STANDARD 17
-  )
-
 endif()
+
+add_executable(KinectReceiverDemo
+  kinect_receiver_demo.cpp
+)
+target_link_libraries(KinectReceiverDemo
+  ${OpenCV_LIBS}
+  KinectToHololens
+)
+set_target_properties(KinectReceiverDemo PROPERTIES
+  CXX_STANDARD 17
+)
