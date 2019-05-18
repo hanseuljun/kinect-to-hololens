@@ -21,6 +21,11 @@ public class ReceiverDemoManager : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        print("interface: " + KinectToHololensPlugin.has_unity_interfaces());
+    }
+
     void Update()
     {
         if (receiver == null)
