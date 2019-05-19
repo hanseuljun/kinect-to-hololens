@@ -8,11 +8,9 @@ namespace kh
 {
 class ChannelTexture
 {
-private:
-	ChannelTexture(int width, int height, ID3D11Texture2D* texture);
 public:
+	ChannelTexture(ID3D11Device* device, int width, int height);
 	~ChannelTexture();
-	static std::unique_ptr<ChannelTexture> create(ID3D11Device* device, int width, int height);
 	int width() { return width_; }
 	int height() { return height_; }
 	ID3D11ShaderResourceView* getTextureView(ID3D11Device* device);

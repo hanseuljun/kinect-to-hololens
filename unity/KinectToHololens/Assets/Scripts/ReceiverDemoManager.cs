@@ -9,17 +9,15 @@ public class ReceiverDemoManager : MonoBehaviour
     public InputField ipAddressInputField;
     public InputField portInputField;
     public Button connectButton;
-    public Receiver receiver;
-    public Vp8Decoder decoder;
-    public Texture yTexture;
-    public Texture uTexture;
-    public Texture vTexture;
-    public Texture depthTexture;
     public MeshRenderer yQuad;
     public MeshRenderer uQuad;
     public MeshRenderer vQuad;
     public MeshRenderer colorQuad;
     public MeshRenderer depthQuad;
+
+    private bool textureCreated;
+    private Receiver receiver;
+    private Vp8Decoder decoder;
 
     public bool UiVisibility
     {
@@ -31,58 +29,43 @@ public class ReceiverDemoManager : MonoBehaviour
         }
     }
 
-    private void Awake()
+    public bool QuadVisibility
     {
-        print("interface: " + Plugin.has_unity_interfaces());
+        set
+        {
+            yQuad.gameObject.SetActive(value);
+            uQuad.gameObject.SetActive(value);
+            vQuad.gameObject.SetActive(value);
+            colorQuad.gameObject.SetActive(value);
+            depthQuad.gameObject.SetActive(value);
+        }
+    }
+
+    void Awake()
+    {
+        UiVisibility = true;
+        QuadVisibility = false;
         PluginHelper.InitTextureGroup();
     }
 
     void Update()
     {
-        const int COLOR_WIDTH = 960;
-        const int COLOR_HEIGHT = 540;
-        const int DEPTH_WIDTH = 512;
-        const int DEPTH_HEIGHT = 424;
-        if (yTexture == null)
+        if (!textureCreated)
         {
             if(Plugin.texture_group_get_y_texture_view().ToInt64() == 0)
                 return;
 
-            yTexture = Texture2D.CreateExternalTexture(COLOR_WIDTH,
-                                                       COLOR_HEIGHT,
-                                                       TextureFormat.R8,
-                                                       false,
-                                                       false,
-                                                       Plugin.texture_group_get_y_texture_view());
-            yQuad.material.mainTexture = yTexture;
+            var textureGroup = new TextureGroup();
+            yQuad.material.mainTexture = textureGroup.YTexture;
+            uQuad.material.mainTexture = textureGroup.UTexture;
+            vQuad.material.mainTexture = textureGroup.VTexture;
 
-            uTexture = Texture2D.CreateExternalTexture(COLOR_WIDTH / 2,
-                                                       COLOR_HEIGHT / 2,
-                                                       TextureFormat.R8,
-                                                       false,
-                                                       false,
-                                                       Plugin.texture_group_get_u_texture_view());
-            uQuad.material.mainTexture = uTexture;
+            colorQuad.material.SetTexture("_YTex", textureGroup.YTexture);
+            colorQuad.material.SetTexture("_UTex", textureGroup.UTexture);
+            colorQuad.material.SetTexture("_VTex", textureGroup.VTexture);
 
-            vTexture = Texture2D.CreateExternalTexture(COLOR_WIDTH / 2,
-                                                       COLOR_HEIGHT / 2,
-                                                       TextureFormat.R8,
-                                                       false,
-                                                       false,
-                                                       Plugin.texture_group_get_v_texture_view());
-            vQuad.material.mainTexture = vTexture;
-
-            colorQuad.material.SetTexture("_YTex", yTexture);
-            colorQuad.material.SetTexture("_UTex", uTexture);
-            colorQuad.material.SetTexture("_VTex", vTexture);
-
-            depthTexture = Texture2D.CreateExternalTexture(DEPTH_WIDTH,
-                                                           DEPTH_HEIGHT,
-                                                           TextureFormat.R16,
-                                                           false,
-                                                           false,
-                                                           Plugin.texture_group_get_depth_texture_view());
-            depthQuad.material.mainTexture = depthTexture;
+            depthQuad.material.mainTexture = textureGroup.DepthTexture;
+            textureCreated = true;
         }
 
         if (receiver == null)
@@ -156,6 +139,7 @@ public class ReceiverDemoManager : MonoBehaviour
         var receiver = new Receiver();
         if (await receiver.ConnectAsync(new IPEndPoint(IPAddress.Parse(ipAddress), port)))
         {
+            QuadVisibility = true;
             this.receiver = receiver;
             decoder = new Vp8Decoder();
         }

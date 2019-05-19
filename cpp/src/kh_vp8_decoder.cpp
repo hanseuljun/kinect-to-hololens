@@ -87,7 +87,7 @@ FFmpegFrame Vp8Decoder::decode(uint8_t* vp8_frame_data, size_t vp8_frame_size)
         // Returns the number of bytes used.
         int size = av_parser_parse2(codec_parser_context_,
             codec_context_, &packet_->data, &packet_->size,
-            data, data_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+            data, static_cast<int>(data_size), AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 
         if (size < 0)
             throw std::exception("Error from av_parser_parse2.");

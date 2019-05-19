@@ -8,11 +8,9 @@ namespace kh
 {
 class DepthTexture
 {
-private:
-    DepthTexture(int width, int height, ID3D11Texture2D* texture);
 public:
+    DepthTexture(ID3D11Device* device, int width, int height);
     ~DepthTexture();
-	static std::unique_ptr<DepthTexture> create(ID3D11Device* device, int width, int height);
     int width() { return width_; }
     int height() { return height_; }
     ID3D11ShaderResourceView* getTextureView(ID3D11Device* device);

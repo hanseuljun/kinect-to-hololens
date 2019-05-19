@@ -77,6 +77,9 @@ public:
     }
     FFmpegFrame& operator=(FFmpegFrame&& other) noexcept
     {
+        if (av_frame_)
+            av_frame_free(&av_frame_);
+
         av_frame_ = other.av_frame_;
         other.av_frame_ = nullptr;
         return *this;

@@ -26,10 +26,10 @@ std::vector<uint8_t> rvl_frame_;
 
 void texture_group_init(ID3D11Device* device)
 {
-    y_texture_ = kh::ChannelTexture::create(device, COLOR_WIDTH, COLOR_HEIGHT);
-    u_texture_ = kh::ChannelTexture::create(device, COLOR_WIDTH / 2, COLOR_HEIGHT / 2);
-    v_texture_ = kh::ChannelTexture::create(device, COLOR_WIDTH / 2, COLOR_HEIGHT / 2);
-    depth_texture_ = kh::DepthTexture::create(device, DEPTH_WIDTH, DEPTH_HEIGHT);
+    y_texture_ = std::make_unique<kh::ChannelTexture>(device, COLOR_WIDTH, COLOR_HEIGHT);
+    u_texture_ = std::make_unique<kh::ChannelTexture>(device, COLOR_WIDTH / 2, COLOR_HEIGHT / 2);
+    v_texture_ = std::make_unique<kh::ChannelTexture>(device, COLOR_WIDTH / 2, COLOR_HEIGHT / 2);
+    depth_texture_ = std::make_unique<kh::DepthTexture>(device, DEPTH_WIDTH, DEPTH_HEIGHT);
 
     y_texture_view_ = y_texture_->getTextureView(device);
     u_texture_view_ = u_texture_->getTextureView(device);
