@@ -10,6 +10,16 @@ public class ReceiverDemoManager : MonoBehaviour
     public InputField portInputField;
     public Button connectButton;
     public Receiver receiver;
+    public Vp8Decoder decoder;
+    public Texture yTexture;
+    public Texture uTexture;
+    public Texture vTexture;
+    public Texture depthTexture;
+    public MeshRenderer yQuad;
+    public MeshRenderer uQuad;
+    public MeshRenderer vQuad;
+    public MeshRenderer colorQuad;
+    public MeshRenderer depthQuad;
 
     public bool UiVisibility
     {
@@ -23,15 +33,60 @@ public class ReceiverDemoManager : MonoBehaviour
 
     private void Awake()
     {
-        print("interface: " + KinectToHololensPlugin.has_unity_interfaces());
+        print("interface: " + Plugin.has_unity_interfaces());
+        PluginHelper.InitTextureGroup();
     }
 
     void Update()
     {
-        if (receiver == null)
+        const int COLOR_WIDTH = 960;
+        const int COLOR_HEIGHT = 540;
+        const int DEPTH_WIDTH = 512;
+        const int DEPTH_HEIGHT = 424;
+        if (yTexture == null)
         {
-            return;
+            if(Plugin.texture_group_get_y_texture_view().ToInt64() == 0)
+                return;
+
+            yTexture = Texture2D.CreateExternalTexture(COLOR_WIDTH,
+                                                       COLOR_HEIGHT,
+                                                       TextureFormat.R8,
+                                                       false,
+                                                       false,
+                                                       Plugin.texture_group_get_y_texture_view());
+            yQuad.material.mainTexture = yTexture;
+
+            uTexture = Texture2D.CreateExternalTexture(COLOR_WIDTH / 2,
+                                                       COLOR_HEIGHT / 2,
+                                                       TextureFormat.R8,
+                                                       false,
+                                                       false,
+                                                       Plugin.texture_group_get_u_texture_view());
+            uQuad.material.mainTexture = uTexture;
+
+            vTexture = Texture2D.CreateExternalTexture(COLOR_WIDTH / 2,
+                                                       COLOR_HEIGHT / 2,
+                                                       TextureFormat.R8,
+                                                       false,
+                                                       false,
+                                                       Plugin.texture_group_get_v_texture_view());
+            vQuad.material.mainTexture = vTexture;
+
+            colorQuad.material.SetTexture("_YTex", yTexture);
+            colorQuad.material.SetTexture("_UTex", uTexture);
+            colorQuad.material.SetTexture("_VTex", vTexture);
+
+            depthTexture = Texture2D.CreateExternalTexture(DEPTH_WIDTH,
+                                                           DEPTH_HEIGHT,
+                                                           TextureFormat.R16,
+                                                           false,
+                                                           false,
+                                                           Plugin.texture_group_get_depth_texture_view());
+            depthQuad.material.mainTexture = depthTexture;
         }
+
+        if (receiver == null)
+            return;
 
         byte[] message;
         try
@@ -46,9 +101,7 @@ public class ReceiverDemoManager : MonoBehaviour
         }
 
         if (message == null)
-        {
             return;
-        }
 
         if (message[0] == 0)
         {
@@ -65,7 +118,8 @@ public class ReceiverDemoManager : MonoBehaviour
 
             IntPtr vp8FrameBytes = Marshal.AllocHGlobal(vp8FrameSize);
             Marshal.Copy(message, cursor, vp8FrameBytes, vp8FrameSize);
-            //var colorByteFrame = NativeByteFrame.Create(vp8FrameBytes, vp8FrameSize);
+            var ffmpegFrame = decoder.Decode(vp8FrameBytes, vp8FrameSize);
+            Plugin.texture_group_set_ffmpeg_frame(ffmpegFrame.Ptr);
             Marshal.FreeHGlobal(vp8FrameBytes);
             cursor += vp8FrameSize;
 
@@ -74,7 +128,7 @@ public class ReceiverDemoManager : MonoBehaviour
 
             IntPtr rvlFrameBytes = Marshal.AllocHGlobal(rvlFrameSize);
             Marshal.Copy(message, cursor, rvlFrameBytes, rvlFrameSize);
-            //var depthByteFrame = NativeByteFrame.Create(rvlFrameBytes, rvlFrameSize);
+            Plugin.texture_group_set_rvl_frame(rvlFrameBytes, rvlFrameSize);
             Marshal.FreeHGlobal(rvlFrameBytes);
             cursor += rvlFrameSize;
 
@@ -82,6 +136,8 @@ public class ReceiverDemoManager : MonoBehaviour
             {
                 Debug.LogFormat("Received frame {0} (vp8FrameSize: {1}, rvlFrameSize: {2}).", frameId, vp8FrameSize, rvlFrameSize);
             }
+
+            PluginHelper.UpdateTextureGroup();
         }
     }
 
@@ -101,6 +157,7 @@ public class ReceiverDemoManager : MonoBehaviour
         if (await receiver.ConnectAsync(new IPEndPoint(IPAddress.Parse(ipAddress), port)))
         {
             this.receiver = receiver;
+            decoder = new Vp8Decoder();
         }
         else
         {

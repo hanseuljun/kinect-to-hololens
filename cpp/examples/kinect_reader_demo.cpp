@@ -23,7 +23,7 @@ void _display_frames()
 
         auto yuv_image = createHalvedYuvImageFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
         auto vp8_frame = encoder.encode(yuv_image);
-        auto ffmpeg_frame = decoder.decode(vp8_frame);
+        auto ffmpeg_frame = decoder.decode(vp8_frame.data(), vp8_frame.size());
         auto color_mat = createCvMatFromYuvImage(createYuvImageFromAvFrame(ffmpeg_frame.av_frame()));
 
         auto rvl_frame = createRvlFrameFromKinectDepthBuffer(kinect_frame->depth_frame()->getUnderlyingBuffer());

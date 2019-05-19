@@ -32,3 +32,5 @@ Copy-Item "$ffmpegX86Path\swresample-3.dll" -Destination "$assetsPath\Plugins\WS
 Copy-Item "$ffmpegX64Path\avcodec-58.dll" -Destination "$assetsPath\Editor"
 Copy-Item "$ffmpegX64Path\avutil-56.dll" -Destination "$assetsPath\Editor"
 Copy-Item "$ffmpegX64Path\swresample-3.dll" -Destination "$assetsPath\Editor"
+
+Pause

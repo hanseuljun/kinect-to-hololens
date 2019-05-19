@@ -6,3 +6,4 @@ $CMakeToolchainFile = (Get-Location).path + "\..\vcpkg\scripts\buildsystems\vcpk
 
 cmake -S . -B .\build\x86 -G "Visual Studio 15 2017" -A Win32 -DCMAKE_TOOLCHAIN_FILE="$CMakeToolchainFile"
 cmake -S . -B .\build\x64 -G "Visual Studio 15 2017" -A x64 -DCMAKE_TOOLCHAIN_FILE="$CMakeToolchainFile"
+Pause

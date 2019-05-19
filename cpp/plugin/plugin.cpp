@@ -2,6 +2,7 @@
 #include <d3d11.h>
 #include "unity/IUnityGraphics.h"
 #include "unity/IUnityGraphicsD3D11.h"
+#include "texture_group.h"
 
 static IUnityInterfaces* unity_interfaces_ = nullptr;
 static IUnityGraphics* unity_graphics_ = nullptr;
@@ -33,14 +34,14 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
 {
-	//switch (eventID) {
-	//case tp::RenderEvent::TexturePixelUpdaterInitializeTextures:
-	//	texture_pixel_updater_initialize_textures(d3d11_device_);
-	//	break;
-	//case tp::RenderEvent::TexturePixelUpdaterRenderFrame:
-	//	texture_pixel_updater_render_frame(d3d11_device_, d3d11_device_context_);
-	//	break;
-	//}
+	switch (eventID) {
+	case 0:
+		texture_group_init(d3d11_device_);
+		break;
+	case 1:
+		texture_group_update(d3d11_device_, d3d11_device_context_);
+		break;
+	}
 }
 
 // Function that gets called by Unity.

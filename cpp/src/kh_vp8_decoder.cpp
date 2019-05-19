@@ -70,16 +70,16 @@ void decodePacket(std::vector<FFmpegFrame>& decoder_frames, AVCodecContext* code
     return;
 }
 
-FFmpegFrame Vp8Decoder::decode(const std::vector<uint8_t>& av_frame)
+FFmpegFrame Vp8Decoder::decode(uint8_t* vp8_frame_data, size_t vp8_frame_size)
 {
     std::vector<FFmpegFrame> decoder_frames;
     /* use the parser to split the data into frames */
-    size_t data_size = av_frame.size();
+    size_t data_size = vp8_frame_size;
     // Adding buffer padding is important!
     // Removing this results in crashes that happens in a way hard to debug!!! (I know it since it happened to me...)
     // When it happens, it happens with av_parser_parse2.
     std::unique_ptr<uint8_t> padded_data(new uint8_t[data_size + AV_INPUT_BUFFER_PADDING_SIZE]);
-    memcpy(padded_data.get(), av_frame.data(), data_size);
+    memcpy(padded_data.get(), vp8_frame_data, data_size);
     memset(padded_data.get() + data_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
     uint8_t* data = padded_data.get();
 

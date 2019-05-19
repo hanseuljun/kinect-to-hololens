@@ -6,20 +6,6 @@
 
 namespace kh
 {
-class Vp8Decoder
-{
-public:
-    Vp8Decoder();
-    ~Vp8Decoder();
-    FFmpegFrame decode(const std::vector<uint8_t>& av_frame);
-
-private:
-    AVPacket* packet_;
-    AVCodec* codec_;
-    AVCodecParserContext* codec_parser_context_;
-    AVCodecContext* codec_context_;
-};
-
 class Vp8Encoder
 {
 public:
@@ -32,5 +18,19 @@ private:
     vpx_image_t image_;
     int keyframe_interval_;
     int frame_index_;
+};
+
+class Vp8Decoder
+{
+public:
+    Vp8Decoder();
+    ~Vp8Decoder();
+    FFmpegFrame decode(uint8_t* vp8_frame_data, size_t vp8_frame_size);
+
+private:
+    AVPacket* packet_;
+    AVCodec* codec_;
+    AVCodecParserContext* codec_parser_context_;
+    AVCodecContext* codec_context_;
 };
 }
