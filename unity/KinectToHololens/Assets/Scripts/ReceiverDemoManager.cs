@@ -43,6 +43,7 @@ public class ReceiverDemoManager : MonoBehaviour
 
     void Awake()
     {
+        textureCreated = false;
         UiVisibility = true;
         QuadVisibility = false;
         PluginHelper.InitTextureGroup();

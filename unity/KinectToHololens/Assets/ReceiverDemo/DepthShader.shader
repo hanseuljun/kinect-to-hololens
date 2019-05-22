@@ -1,4 +1,4 @@
-﻿Shader "KinectToHololens/DepthShader"
+﻿Shader "KinectToHololens/Depth"
 {
     Properties
     {

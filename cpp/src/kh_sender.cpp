@@ -27,10 +27,9 @@ void Sender::send(kinect::KinectIntrinsics intrinsics)
     cursor += 1;
 
     memcpy(buffer.data() + cursor, &intrinsics.color_params, sizeof(intrinsics.color_params));
-    cursor += 4;
+    cursor += sizeof(intrinsics.color_params);
 
     memcpy(buffer.data() + cursor, &intrinsics.ir_params, sizeof(intrinsics.ir_params));
-    cursor += 4;
 
     _send(buffer);
 }
@@ -65,7 +64,6 @@ void Sender::send(int frame_id, std::vector<uint8_t>& vp8_frame, std::vector<uin
     cursor += 4;
 
     memcpy(buffer.data() + cursor, rvl_frame.data(), rvl_frame.size());
-    cursor += rvl_frame.size();
 
     _send(buffer);
 }

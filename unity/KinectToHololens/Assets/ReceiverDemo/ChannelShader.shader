@@ -1,4 +1,4 @@
-﻿Shader "KinectToHololens/ChannelShader"
+﻿Shader "KinectToHololens/Channel"
 {
     Properties
     {
