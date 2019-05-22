@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/ReceiverDemo.unity
-    guid: 975ed892b0f56fe4282675f841b20482
+    path: Assets/Scenes/HololensDemo.unity
+    guid: 8d84af6e90e20ca47a877f9776a624b3
   m_configObjects: {}

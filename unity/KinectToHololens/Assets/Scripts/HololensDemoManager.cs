@@ -2,6 +2,7 @@
 using System.Net;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.XR.WSA.Input;
 
 public class HololensDemoManager : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class HololensDemoManager : MonoBehaviour
     public Material screenMaterial;
     public ScreenRenderer screenRenderer;
 
+    private GestureRecognizer gestureRecognizer;
     private InputState inputState;
     private bool textureCreated;
     private Receiver receiver;
@@ -47,18 +49,21 @@ public class HololensDemoManager : MonoBehaviour
 
     void Awake()
     {
+        gestureRecognizer = new GestureRecognizer();
         textureCreated = false;
         UiVisibility = true;
         SetInputState(InputState.IpAddress);
         PluginHelper.InitTextureGroup();
+
+        gestureRecognizer.Tapped += OnTapped;
+        gestureRecognizer.StartCapturingGestures();
     }
 
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            scenceRootTransform.localPosition = cameraTransform.localPosition;
-            scenceRootTransform.localRotation = cameraTransform.localRotation;
+            ResetView();
         }
 
         AbsorbInput();
@@ -247,6 +252,17 @@ public class HololensDemoManager : MonoBehaviour
 
             PluginHelper.UpdateTextureGroup();
         }
+    }
+
+    private void OnTapped(TappedEventArgs args)
+    {
+        ResetView();
+    }
+
+    private void ResetView()
+    {
+        scenceRootTransform.localPosition = cameraTransform.localPosition;
+        scenceRootTransform.localRotation = cameraTransform.localRotation;
     }
 
     private void AbsorbInput()
