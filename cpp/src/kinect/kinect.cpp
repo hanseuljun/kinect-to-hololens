@@ -62,8 +62,11 @@ std::optional<KinectIntrinsics> obtainKinectIntrinsics()
             break;
     }
 
-    if (!device)
+    if (!device) {
+        std::cout << "Check whether UsbDk has been installed to this machine." << std::endl;
         return std::nullopt;
+    }
+
     if (!device->start())
         return std::nullopt;
 
