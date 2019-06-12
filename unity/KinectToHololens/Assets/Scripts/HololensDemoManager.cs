@@ -226,6 +226,8 @@ public class HololensDemoManager : MonoBehaviour
             int frameId = BitConverter.ToInt32(message, cursor);
             cursor += 4;
 
+            receiver.Send(frameId);
+
             int vp8FrameSize = BitConverter.ToInt32(message, cursor);
             cursor += 4;
 
