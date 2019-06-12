@@ -2,56 +2,6 @@
 
 namespace kh
 {
-MessageBuffer::MessageBuffer()
-    : size_bytes_(4)
-    , size_cursor_(0)
-    , message_bytes_()
-    , message_cursor_(0)
-{
-}
-
-// Returns a message if there is one available.
-// Returns an std::nullopt if no message is found.
-// Throw an excpetion if there is an error.
-std::optional<std::vector<uint8_t>> MessageBuffer::receive(asio::ip::tcp::socket& socket)
-{
-    if (size_cursor_ < size_bytes_.size()) {
-        std::error_code error_code;
-        int size_result = socket.receive(asio::buffer(size_bytes_.data() + size_cursor_, size_bytes_.size() - size_cursor_), 0, error_code);
-        if (error_code && error_code != asio::error::would_block) {
-            auto error_message = std::string("Error receiving message size: ") + std::to_string(error_code.value());
-            throw std::exception(error_message.c_str());
-        } else {
-            size_cursor_ += size_result;
-        }
-
-        if (size_cursor_ == size_bytes_.size()) {
-            int message_size;
-            memcpy(&message_size, size_bytes_.data(), 4);
-            message_bytes_ = std::vector<uint8_t>(message_size);
-        } else {
-            return std::nullopt;
-        }
-    }
-
-    std::error_code error_code;
-    int message_result = socket.receive(asio::buffer(message_bytes_.data() + message_cursor_, message_bytes_.size() - message_cursor_), 0, error_code);
-    if (error_code && error_code != asio::error::would_block) {
-        auto error_message = std::string("Error receiving message: ") + std::to_string(error_code.value());
-        throw std::exception(error_message.c_str());
-    } else {
-        message_cursor_ += message_result;
-    }
-
-    if (message_cursor_ < message_bytes_.size())
-        return std::nullopt;
-
-    size_cursor_ = 0;
-    message_cursor_ = 0;
-
-    return message_bytes_;
-}
-
 Receiver::Receiver(asio::io_context& io_context)
     : socket_(io_context), message_buffer_()
 {
@@ -73,5 +23,25 @@ bool Receiver::connect(std::string ip_address, int port)
 std::optional<std::vector<uint8_t>> Receiver::receive()
 {
     return message_buffer_.receive(socket_);
+}
+
+void Receiver::send(int frame_id)
+{
+    uint32_t message_size = static_cast<uint32_t>(1 + 4);
+    uint32_t buffer_size = static_cast<uint32_t>(4 + message_size);
+
+    std::vector<uint8_t> buffer(buffer_size);
+    size_t cursor = 0;
+
+    memcpy(buffer.data() + cursor, &message_size, 4);
+    cursor += 4;
+
+    // Message type
+    buffer[4] = static_cast<uint8_t>(0);
+    cursor += 1;
+
+    memcpy(buffer.data() + cursor, &frame_id, 4);
+
+    sendMessageBuffer(socket_, buffer);
 }
 }

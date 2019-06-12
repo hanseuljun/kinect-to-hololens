@@ -22,50 +22,51 @@ void _receive_frames(std::string ip_address, int port)
     Vp8Decoder decoder;
     for (;;) {
         auto receive_result = receiver.receive();
-        if (receive_result) {
-            int cursor = 0;
+        if(!receive_result)
+            continue;
 
-            auto message_type = (*receive_result)[0];
-            cursor += 1;
+        int cursor = 0;
 
-            if (message_type == 0) {
-                std::cout << "Received intrinsics." << std::endl;
-            }
-            else if (message_type == 1) {
-                int frame_id;
-                memcpy(&frame_id, receive_result->data() + cursor, 4);
-                cursor += 4;
+        auto message_type = (*receive_result)[0];
+        cursor += 1;
 
-                int vp8_frame_size;
-                memcpy(&vp8_frame_size, receive_result->data() + cursor, 4);
-                cursor += 4;
+        if (message_type == 0) {
+            std::cout << "Received intrinsics." << std::endl;
+        } else if (message_type == 1) {
+            int frame_id;
+            memcpy(&frame_id, receive_result->data() + cursor, 4);
+            cursor += 4;
 
-                std::vector<uint8_t> vp8_frame(vp8_frame_size);
-                memcpy(vp8_frame.data(), receive_result->data() + cursor, vp8_frame_size);
-                cursor += vp8_frame_size;
+            if(frame_id % 100 == 0)
+                std::cout << "Received frame " << frame_id << "." << std::endl;
+            receiver.send(frame_id);
 
-                int rvl_frame_size;
-                memcpy(&rvl_frame_size, receive_result->data() + cursor, 4);
-                cursor += 4;
+            int vp8_frame_size;
+            memcpy(&vp8_frame_size, receive_result->data() + cursor, 4);
+            cursor += 4;
 
-                std::vector<uint8_t> rvl_frame(rvl_frame_size);
-                memcpy(rvl_frame.data(), receive_result->data() + cursor, rvl_frame_size);
-                cursor += rvl_frame_size;
+            std::vector<uint8_t> vp8_frame(vp8_frame_size);
+            memcpy(vp8_frame.data(), receive_result->data() + cursor, vp8_frame_size);
+            cursor += vp8_frame_size;
 
-                if (frame_id % 100 == 0)
-                    std::cout << "Received frame " << frame_id << "." << std::endl;
+            int rvl_frame_size;
+            memcpy(&rvl_frame_size, receive_result->data() + cursor, 4);
+            cursor += 4;
 
-                auto ffmpeg_frame = decoder.decode(vp8_frame.data(), vp8_frame.size());
-                auto color_mat = createCvMatFromYuvImage(createYuvImageFromAvFrame(ffmpeg_frame.av_frame()));
+            std::vector<uint8_t> rvl_frame(rvl_frame_size);
+            memcpy(rvl_frame.data(), receive_result->data() + cursor, rvl_frame_size);
+            cursor += rvl_frame_size;
 
-                auto depth_image = createDepthImageFromRvlFrame(rvl_frame.data());
-                auto depth_mat = createCvMatFromKinectDepthImage(depth_image.data());
+            auto ffmpeg_frame = decoder.decode(vp8_frame.data(), vp8_frame.size());
+            auto color_mat = createCvMatFromYuvImage(createYuvImageFromAvFrame(ffmpeg_frame.av_frame()));
 
-                cv::imshow("Color", color_mat);
-                cv::imshow("Depth", depth_mat);
-                if (cv::waitKey(1) >= 0)
-                    break;
-            }
+            auto depth_image = createDepthImageFromRvlFrame(rvl_frame.data());
+            auto depth_mat = createCvMatFromKinectDepthImage(depth_image.data());
+
+            cv::imshow("Color", color_mat);
+            cv::imshow("Depth", depth_mat);
+            if (cv::waitKey(1) >= 0)
+                break;
         }
     }
 }

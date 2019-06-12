@@ -30,19 +30,29 @@ void _send_frames(int port)
     std::cout << "Accepted a client!" << std::endl;
 
     Sender sender(std::move(socket));
-
-    bool stopped = false;
-    std::thread thread([&io_context, &stopped]() {
-        while (!stopped)
-            io_context.run();
-    });
-
     sender.send(*intrinsics);
 
+    const int MAXIMUM_FRAME_ID_DIFF = 1;
     int frame_id = 0;
+    int receiver_frame_id = 0;
     for (;;) {
         auto kinect_frame = device->acquireFrame();
         if (!kinect_frame)
+            continue;
+
+        auto receive_result = sender.receive();
+        if(receive_result) {
+            int cursor = 0;
+
+            auto message_type = (*receive_result)[0];
+            cursor += 1;
+
+            if(message_type == 0) {
+                memcpy(&receiver_frame_id, receive_result->data() + cursor, 4);
+            }
+        }
+
+        if(frame_id - receiver_frame_id > MAXIMUM_FRAME_ID_DIFF)
             continue;
 
         auto yuv_image = createHalvedYuvImageFromKinectColorBuffer(kinect_frame->color_frame()->getRawUnderlyingBuffer());
@@ -60,10 +70,6 @@ void _send_frames(int port)
             break;
         }
     }
-
-    stopped = true;
-    io_context.stop();
-    thread.join();
 
     std::cout << "Stopped sending Kinect frames." << std::endl;
 }

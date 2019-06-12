@@ -10,6 +10,8 @@ set(SOURCE_FILES
   kh_vp8_decoder.cpp
   kh_rvl.h
   kh_rvl.cpp
+  kh_message.h
+  kh_message.cpp
   kh_sender.h
   kh_sender.cpp
   kh_receiver.h

@@ -1,5 +1,7 @@
 #include "kh_sender.h"
 
+#include "kh_message.h"
+
 namespace kh
 {
 Sender::Sender(asio::ip::tcp::socket&& socket)
@@ -31,7 +33,7 @@ void Sender::send(kinect::KinectIntrinsics intrinsics)
 
     memcpy(buffer.data() + cursor, &intrinsics.ir_params, sizeof(intrinsics.ir_params));
 
-    _send(buffer);
+    sendMessageBuffer(socket_, buffer);
 }
 
 void Sender::send(int frame_id, std::vector<uint8_t>& vp8_frame, std::vector<uint8_t> rvl_frame)
@@ -65,23 +67,11 @@ void Sender::send(int frame_id, std::vector<uint8_t>& vp8_frame, std::vector<uin
 
     memcpy(buffer.data() + cursor, rvl_frame.data(), rvl_frame.size());
 
-    _send(buffer);
+    sendMessageBuffer(socket_, buffer);
 }
 
-void Sender::_send(std::vector<uint8_t>& buffer)
+std::optional<std::vector<uint8_t>> Sender::receive()
 {
-    std::error_code error_code;
-
-    // Bytes may not be sent. It usually happens due to network congestion.
-    // The current solution is to try again until the bytes get sent.
-    for (;;) {
-        size_t size = socket_.send(asio::buffer(buffer.data(), buffer.size()), 0, error_code);
-        if (size == buffer.size())
-            break;
-        if (error_code && (error_code != asio::error::would_block))
-            throw std::exception("An error from a sender...");
-        if (size != 0)
-            throw std::exception("A sender sent the buffer partially...");
-    }
+    return message_buffer_.receive(socket_);
 }
 }
