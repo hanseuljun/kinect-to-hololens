@@ -67,8 +67,10 @@ std::optional<KinectIntrinsics> obtainKinectIntrinsics()
         return std::nullopt;
     }
 
-    if (!device->start())
+    if (!device->start()) {
+        std::cout << "Failed to start Freenect2 device." << std::endl;
         return std::nullopt;
+    }
 
     KinectIntrinsics intrinsics;
     intrinsics.color_params = device->getColorCameraParams();

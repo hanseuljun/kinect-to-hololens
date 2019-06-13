@@ -116,7 +116,6 @@ public class ReceiverDemoManager : MonoBehaviour
             Marshal.Copy(message, cursor, rvlFrameBytes, rvlFrameSize);
             Plugin.texture_group_set_rvl_frame(rvlFrameBytes, rvlFrameSize);
             Marshal.FreeHGlobal(rvlFrameBytes);
-            cursor += rvlFrameSize;
 
             if (frameId % 100 == 0)
             {

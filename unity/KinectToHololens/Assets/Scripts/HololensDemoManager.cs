@@ -12,6 +12,7 @@ public class HololensDemoManager : MonoBehaviour
     }
 
     public Transform cameraTransform;
+    public TextMesh statusText;
     public Transform scenceRootTransform;
     public TextMesh ipAddressText;
     public TextMesh ipAddressInputField;
@@ -57,6 +58,8 @@ public class HololensDemoManager : MonoBehaviour
 
         gestureRecognizer.Tapped += OnTapped;
         gestureRecognizer.StartCapturingGestures();
+
+        statusText.text = "Waiting for user input.";
     }
 
     void Update()
@@ -101,123 +104,7 @@ public class HololensDemoManager : MonoBehaviour
 
         if (message[0] == 0)
         {
-            int cursor = 1;
-
-            KinectColorIntrinsics colorIntrinsics;
-            {
-                float fx = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float fy = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float cx = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float cy = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float shiftD = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float shiftM = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float mxX3y0 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float mxX0y3 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float mxX2y1 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float mxX1y2 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float mxX2y0 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float mxX0y2 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float mxX1y1 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float mxX1y0 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float mxX0y1 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float mxX0y0 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float myX3y0 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float myX0y3 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float myX2y1 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float myX1y2 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float myX2y0 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float myX0y2 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float myX1y1 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float myX1y0 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float myX0y1 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float myX0y0 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-
-                colorIntrinsics = new KinectColorIntrinsics(fx: fx,
-                                                            fy: fy,
-                                                            cx: cx,
-                                                            cy: cy,
-                                                            shiftD: shiftD,
-                                                            shiftM: shiftM,
-                                                            mxX3y0: mxX3y0,
-                                                            mxX0y3: mxX0y3,
-                                                            mxX2y1: mxX2y1,
-                                                            mxX1y2: mxX1y2,
-                                                            mxX2y0: mxX2y0,
-                                                            mxX0y2: mxX0y2,
-                                                            mxX1y1: mxX1y1,
-                                                            mxX1y0: mxX1y0,
-                                                            mxX0y1: mxX0y1,
-                                                            mxX0y0: mxX0y0,
-                                                            myX3y0: myX3y0,
-                                                            myX0y3: myX0y3,
-                                                            myX2y1: myX2y1,
-                                                            myX1y2: myX1y2,
-                                                            myX2y0: myX2y0,
-                                                            myX0y2: myX0y2,
-                                                            myX1y1: myX1y1,
-                                                            myX1y0: myX1y0,
-                                                            myX0y1: myX0y1,
-                                                            myX0y0: myX0y0);
-            }
-
-            KinectIrIntrinsics irIntrinsics;
-            {
-                float fx = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float fy = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float cx = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float cy = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float k1 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float k2 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float k3 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float p1 = BitConverter.ToSingle(message, cursor);
-                cursor += 4;
-                float p2 = BitConverter.ToSingle(message, cursor);
-
-                irIntrinsics = new KinectIrIntrinsics(fx: fx,
-                                                      fy: fy,
-                                                      cx: cx,
-                                                      cy: cy,
-                                                      k1: k1,
-                                                      k2: k2,
-                                                      k3: k3,
-                                                      p1: p1,
-                                                      p2: p2);
-            }
-
-            var kinectScreen = new KinectScreen(colorIntrinsics, irIntrinsics);
+            var kinectScreen = CreateKinectScreenFromIntrinsicsMessage(message);
             screenRenderer.SetKinectScreen(kinectScreen);
         }
         else if (message[0] == 1)
@@ -245,11 +132,12 @@ public class HololensDemoManager : MonoBehaviour
             Marshal.Copy(message, cursor, rvlFrameBytes, rvlFrameSize);
             Plugin.texture_group_set_rvl_frame(rvlFrameBytes, rvlFrameSize);
             Marshal.FreeHGlobal(rvlFrameBytes);
-            cursor += rvlFrameSize;
 
             if (frameId % 100 == 0)
             {
-                Debug.LogFormat("Received frame {0} (vp8FrameSize: {1}, rvlFrameSize: {2}).", frameId, vp8FrameSize, rvlFrameSize);
+                string logString = string.Format("Received frame {0} (vp8FrameSize: {1}, rvlFrameSize: {2}).", frameId, vp8FrameSize, rvlFrameSize);
+                Debug.Log(logString);
+                statusText.text = logString;
             }
 
             PluginHelper.UpdateTextureGroup();
@@ -331,17 +219,20 @@ public class HololensDemoManager : MonoBehaviour
         string portString = portInputField.text;
         int port = portString.Length != 0 ? int.Parse(portString) : 7777;
 
-        Debug.LogFormat("Try connecting to {0}:{1}.", ipAddress, port);
+        string logString = string.Format("Try connecting to {0}:{1}...", ipAddress, port);
+        Debug.Log(logString);
+        statusText.text = logString;
         var receiver = new Receiver();
         if (await receiver.ConnectAsync(new IPEndPoint(IPAddress.Parse(ipAddress), port)))
         {
-            //QuadVisibility = true;
             this.receiver = receiver;
             decoder = new Vp8Decoder();
+            statusText.text = string.Format("Connected to {0}:{1}!", ipAddress, port);
         }
         else
         {
             UiVisibility = true;
+            statusText.text = string.Format("Failed to connect to {0}:{1}.", ipAddress, port);
         }
     }
 
@@ -359,5 +250,126 @@ public class HololensDemoManager : MonoBehaviour
         }
 
         this.inputState = inputState;
+    }
+
+    private static KinectScreen CreateKinectScreenFromIntrinsicsMessage(byte[] message)
+    {
+
+        int cursor = 1;
+        KinectColorIntrinsics colorIntrinsics;
+        {
+            float fx = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float fy = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float cx = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float cy = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float shiftD = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float shiftM = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float mxX3y0 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float mxX0y3 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float mxX2y1 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float mxX1y2 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float mxX2y0 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float mxX0y2 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float mxX1y1 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float mxX1y0 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float mxX0y1 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float mxX0y0 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float myX3y0 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float myX0y3 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float myX2y1 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float myX1y2 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float myX2y0 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float myX0y2 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float myX1y1 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float myX1y0 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float myX0y1 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float myX0y0 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+
+            colorIntrinsics = new KinectColorIntrinsics(fx: fx,
+                                                        fy: fy,
+                                                        cx: cx,
+                                                        cy: cy,
+                                                        shiftD: shiftD,
+                                                        shiftM: shiftM,
+                                                        mxX3y0: mxX3y0,
+                                                        mxX0y3: mxX0y3,
+                                                        mxX2y1: mxX2y1,
+                                                        mxX1y2: mxX1y2,
+                                                        mxX2y0: mxX2y0,
+                                                        mxX0y2: mxX0y2,
+                                                        mxX1y1: mxX1y1,
+                                                        mxX1y0: mxX1y0,
+                                                        mxX0y1: mxX0y1,
+                                                        mxX0y0: mxX0y0,
+                                                        myX3y0: myX3y0,
+                                                        myX0y3: myX0y3,
+                                                        myX2y1: myX2y1,
+                                                        myX1y2: myX1y2,
+                                                        myX2y0: myX2y0,
+                                                        myX0y2: myX0y2,
+                                                        myX1y1: myX1y1,
+                                                        myX1y0: myX1y0,
+                                                        myX0y1: myX0y1,
+                                                        myX0y0: myX0y0);
+        }
+
+        KinectIrIntrinsics irIntrinsics;
+        {
+            float fx = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float fy = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float cx = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float cy = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float k1 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float k2 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float k3 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float p1 = BitConverter.ToSingle(message, cursor);
+            cursor += 4;
+            float p2 = BitConverter.ToSingle(message, cursor);
+
+            irIntrinsics = new KinectIrIntrinsics(fx: fx,
+                                                  fy: fy,
+                                                  cx: cx,
+                                                  cy: cy,
+                                                  k1: k1,
+                                                  k2: k2,
+                                                  k3: k3,
+                                                  p1: p1,
+                                                  p2: p2);
+        }
+
+        return new KinectScreen(colorIntrinsics, irIntrinsics);
     }
 }

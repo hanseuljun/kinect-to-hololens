@@ -70,6 +70,7 @@ void _send_frames(int port)
         intrinsics = get_substitute_kinect_intrinsics();
     }
 
+    std::cout << "Waiting for a client..." << std::endl;
     Vp8Encoder encoder(960, 540, 2000);
 
     asio::io_context io_context;
