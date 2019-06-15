@@ -85,6 +85,10 @@ void _send_frames(int port)
     const int MAXIMUM_FRAME_ID_DIFF = 1;
     int frame_id = 0;
     int receiver_frame_id = 0;
+
+    auto start = std::chrono::system_clock::now();
+    int frame_count = 0;
+    int frame_size = 0;
     for (;;) {
         auto kinect_frame = device->acquireFrame();
         if (!kinect_frame)
@@ -110,8 +114,17 @@ void _send_frames(int port)
 
         auto rvl_frame = createRvlFrameFromKinectDepthBuffer(kinect_frame->depth_frame()->getUnderlyingBuffer());
 
-        if (frame_id % 100 == 0)
-            std::cout << "Sending frame " << frame_id << "." << std::endl;
+        if (frame_id % 100 == 0) {
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double> diff = end - start;
+            std::cout << "Sending frame " << frame_id
+                      << ", FPS: " << frame_count / diff.count()
+                      << ", Bandwidth: " << frame_size / (diff.count() * 131072) // 131072 = 1024 * 1024 / 8
+                      << " Mbps.\r";
+            start = end;
+            frame_count = 0;
+            frame_size = 0;
+        }
 
         try {
             sender.send(frame_id++, vp8_frame, rvl_frame);
@@ -119,6 +132,9 @@ void _send_frames(int port)
             std::cout << e.what() << std::endl;
             break;
         }
+
+        ++frame_count;
+        frame_size += vp8_frame.size() + rvl_frame.size();
     }
 
     std::cout << "Stopped sending Kinect frames." << std::endl;
