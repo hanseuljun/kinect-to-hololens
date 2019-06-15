@@ -57,18 +57,21 @@ void _send_frames(int port)
 {
     std::cout << "Start sending Kinect frames (port: " << port << ")." << std::endl;
 
-    auto device = kinect::obtainKinectDevice();
-    if (!device) {
-        std::cout << "Could not find a Kinect." << std::endl;
-        return;
-    }
-
     auto intrinsics = kinect::obtainKinectIntrinsics();
     if (!intrinsics) {
         std::cout << "Could not find intrinsics of the connected Kinect." << std::endl;
         std::cout << "Using a substitute KinectIntrinsics." << std::endl;
         intrinsics = get_substitute_kinect_intrinsics();
     }
+
+    auto device = kinect::obtainKinectDevice();
+    if (!device) {
+        std::cout << "Could not find a Kinect." << std::endl;
+        return;
+    }
+
+    std::cout << "Waiting for a device to be (re)connected..." << std::endl;
+    while (!device->isAvailable());
 
     std::cout << "Waiting for a client..." << std::endl;
     Vp8Encoder encoder(960, 540, 2000);
@@ -82,7 +85,7 @@ void _send_frames(int port)
     Sender sender(std::move(socket));
     sender.send(*intrinsics);
 
-    const int MAXIMUM_FRAME_ID_DIFF = 1;
+    const int MAXIMUM_FRAME_ID_DIFF = 2;
     int frame_id = 0;
     int receiver_frame_id = 0;
 
