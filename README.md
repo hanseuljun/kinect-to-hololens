@@ -1,16 +1,17 @@
-# kinect-to-hololens
-Receiving RGBD pixels from a Kinect v2 in 30Hz and rendering them in 60 Hz as quads with a HoloLens 1.
+# Kinect to HoloLens
+A pipeline that connects a Kinect v2 and a HoloLens in real-time.
 
 # Requirement
-1. A Windows 10 computer with CMake, Visual Studio 2019, and Unity3D 2018.4
-2. A Kinect v2.
-3. A HoloLens 1.
+- A Windows 10 computer, a Kinect v2, and a HoloLens.
+- CMake, Unity3D 2018.4, and Visual Studio 2019.
 
 # How to build using source files
 1. Initiate vcpkg as a submodule (git submodule init, git submodule update).
 2. Run bootstrap-vcpkg.bat in vcpkg to build vcpkg.exe.
 3. Use vcpkg.exe to install c++ libraries: asio, ffmpeg, libvpx, and opencv.
-- .\vcpkg.exe install asio:x86-windows asio:x64-windows ffmpeg:x86-windows ffmpeg:x64-windows libvpx:x86-windows libvpx:x64-windows opencv:x86-windows opencv:x64-windows
+```powershell
+.\vcpkg.exe install asio:x86-windows asio:x64-windows ffmpeg:x86-windows ffmpeg:x64-windows libvpx:x86-windows libvpx:x64-windows opencv:x86-windows opencv:x64-windows
+```
 4. Install Kinect for Windows SDK 2.0 (https://www.microsoft.com/en-us/download/details.aspx?id=44561).
 5. Install UsbDk (https://github.com/daynix/UsbDk/releases).
 6. Run run-cmake.ps1 in cpp to build Visual Studio solutions with CMake.
@@ -18,11 +19,22 @@ Receiving RGBD pixels from a Kinect v2 in 30Hz and rendering them in 60 Hz as qu
 8. Build executable files with the Unity3D project and the Visual Studio solution in cpp/build/x64.
 
 # How to run
-## kinect_reader_demo.exe
-- Connect your computer to a Kinect v2.
-- Run the exe file.
+## Examples that does not require a HoloLens
+### kinect_reader_demo.exe
+1. Connect your computer to a Kinect v2.
+2. Run the exe file.
 
-## kinect_sender_demo.exe and kinect_receiver_demo.exe
-- Connect a computer to a Kinect v2.
-- Run kinect_sender_demo.exe and enter a port number.
-- Run kinect_receiver_demo.exe from another computer and enter the IP address and the port number of the sender.
+### kinect_sender_demo.exe and kinect_receiver_demo.exe
+1. Connect a computer to a Kinect v2.
+2. Run kinect_sender_demo.exe and enter a port number.
+3. Run kinect_receiver_demo.exe from another computer and enter the IP address and the port number of the sender.
+
+## Examples for a HoloLens
+### kinect_sender_demo.exe and Kinect to HoloLens.
+1. Connect a computer to a Kinect v2.
+2. Run kinect_sender_demo.exe with the computer and enter a port number.
+3. With *the computer*, (install and) run Microsoft HoloLens as an application (https://www.microsoft.com/en-us/p/microsoft-hololens/9nblggh4qwnx).
+4. Through the application, connect your computer to a HoloLens as a device. This step requires the IP address of the devices and also, the device has to be turned on to be connected.
+5. Run Kinect to HoloLens with the HoloLens device.
+6. Enter the IP address and port of the computer running kinect_sender_demo.exe. This requires usage of the virtual keyboard in the HoloLens as an application. First, you will be able enter the IP address through the virtual keyboard. Use the tap key to switch to the port, then enter the port. After that, press enter.
+7. Done!
