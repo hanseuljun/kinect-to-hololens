@@ -15,7 +15,7 @@ A pipeline that connects a Kinect v2 and a HoloLens in real-time.
 4. Install Kinect for Windows SDK 2.0 (https://www.microsoft.com/en-us/download/details.aspx?id=44561).
 5. Install UsbDk (https://github.com/daynix/UsbDk/releases).
 6. Run run-cmake.ps1 in cpp to build Visual Studio solutions with CMake.
-7. Run build-plugin.ps1 to build a Unity3D plugin with the Visual Studio solutions copy DLL files including the plugin built in the previous step for the Unity3D project in unity.
+7. Run build-plugin.ps1 that builds a Unity3D plugin with the Visual Studio solution, then copies DLL files including the plugin into the Unity3D project in unity/KinectToHoloLens.
 8. Build executable files with the Unity3D project and the Visual Studio solution in cpp/build/x64.
 
 # How to run
@@ -30,11 +30,11 @@ A pipeline that connects a Kinect v2 and a HoloLens in real-time.
 3. Run kinect_receiver_demo.exe from another computer and enter the IP address and the port number of the sender.
 
 ## Examples for a HoloLens
-### kinect_sender_demo.exe and Kinect to HoloLens.
+### kinect_sender_demo.exe and Kinect to HoloLens
 1. Connect a computer to a Kinect v2.
 2. Run kinect_sender_demo.exe with the computer and enter a port number.
-3. With *the computer*, (install and) run Microsoft HoloLens as an application (https://www.microsoft.com/en-us/p/microsoft-hololens/9nblggh4qwnx).
-4. Through the application, connect your computer to a HoloLens as a device. This step requires the IP address of the devices and also, the device has to be turned on to be connected.
-5. Run Kinect to HoloLens with the HoloLens device.
-6. Enter the IP address and port of the computer running kinect_sender_demo.exe. This requires usage of the virtual keyboard in the HoloLens as an application. First, you will be able enter the IP address through the virtual keyboard. Use the tap key to switch to the port, then enter the port. After that, press enter.
+3. With *the computer*, (install and) run 'Microsoft HoloLens' as an application (https://www.microsoft.com/en-us/p/microsoft-hololens/9nblggh4qwnx).
+4. Through the application, connect your computer to a HoloLens as a device. This step requires the IP address of the HoloLens device and also, the device has to be turned on to be connected.
+5. Run 'Kinect to HoloLens' with the HoloLens device.
+6. Enter the IP address and port of the computer running kinect_sender_demo.exe to 'Kinect to HoloLens'. This requires usage of the virtual keyboard in the 'Microsoft HoloLens' as an application. First, you will be able enter the IP address through the virtual keyboard. Then use the tab key to switch mode for entering the port, then enter the port. After that, press enter.
 7. Done!
