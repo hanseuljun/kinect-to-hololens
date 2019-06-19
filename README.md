@@ -18,7 +18,7 @@ A pipeline that connects a Kinect v2 and a HoloLens in real-time.
 7. Run build-plugin.ps1 that builds a Unity3D plugin with the Visual Studio solution, then copies DLL files including the plugin into the Unity3D project in unity/KinectToHoloLens.
 8. Build executable files with the Unity3D project and the Visual Studio solution in cpp/build/x64.
 
-# How to Run the Examples
+# Examples
 ## Examples that does not require a HoloLens
 ### kinect_reader_demo.exe
 1. Connect your computer to a Kinect v2.
