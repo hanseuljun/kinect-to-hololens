@@ -8,6 +8,7 @@ namespace kh
 {
 namespace kinect
 {
+// The class for the Kinect frame.
 class KinectFrame
 {
 public:
@@ -25,6 +26,7 @@ private:
     std::unique_ptr<raii::KinectDepthFrame> depth_frame_;
 };
 
+// The class with APIs to access the Kinect.
 class KinectDevice
 {
 public:
@@ -38,13 +40,14 @@ private:
     std::unique_ptr<raii::KinectMultiSourceFrameReader> frame_reader_;
 };
 
+// The intrinsic parameters of the Kinect that can be obtained through Freenect2.
 struct KinectIntrinsics
 {
     libfreenect2::Freenect2Device::ColorCameraParams color_params;
     libfreenect2::Freenect2Device::IrCameraParams ir_params;
 };
 
-// Utility functions.
+// Utility functions for creating a KinectDevice and a KinectIntrinsics.
 std::unique_ptr<KinectDevice> obtainKinectDevice();
 std::optional<KinectIntrinsics> obtainKinectIntrinsics();
 }

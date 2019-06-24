@@ -8,6 +8,7 @@ namespace kinect
 {
 namespace raii
 {
+// An RAII class for IMultiSourceFrame.
 KinectMultiSourceFrame::KinectMultiSourceFrame(IMultiSourceFrame* multi_source_frame)
     : multi_source_frame_(multi_source_frame)
 {

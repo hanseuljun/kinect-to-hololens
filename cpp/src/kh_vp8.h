@@ -6,6 +6,7 @@
 
 namespace kh
 {
+// A wrapper class for libvpx, encoding color pixels into the VP8 codec.
 class Vp8Encoder
 {
 public:
@@ -20,6 +21,7 @@ private:
     int frame_index_;
 };
 
+// A wrapper class for FFMpeg, decoding colors pixels in the VP8 codec.
 class Vp8Decoder
 {
 public:

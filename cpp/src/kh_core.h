@@ -10,7 +10,8 @@ extern "C"
 
 namespace kh
 {
-// Data of this class is not supposed to be copy since it will take a lot of computational resource.
+// An class that contains color pixels in the YUV420 format which Vp8Encoder and Vp8Decoder like.
+// Data of this class is not supposed to be copy since it is computationally expensive.
 class YuvImage
 {
 public:
@@ -56,6 +57,7 @@ private:
     int height_;
 };
 
+// A wrapper for AVFrame, the outcome of Vp8Decoder.
 class FFmpegFrame
 {
 public:
@@ -90,7 +92,12 @@ private:
     AVFrame* av_frame_;
 };
 
-// Downsample width and height by 2.
+// createHalvedYuvImageFromKinectColorBuffer(): converts color pixels to a YuvImage
+//   while halving the Kinect's resolution.
+// createYuvImageFromAvFrame(): converts the outcome of Vp8Decoder to color pixels in Yuv420.
+// createRvlFrameFromKinectDepthBuffer(): compresses depth pixels using RVL.
+// createDepthImageFromRvlFrame(): decompresses depth pixels compressed by RVL.
+// See kh_core.cpp for details.
 YuvImage createHalvedYuvImageFromKinectColorBuffer(uint8_t* buffer);
 YuvImage createYuvImageFromAvFrame(AVFrame* av_frame);
 std::vector<uint8_t> createRvlFrameFromKinectDepthBuffer(uint16_t* buffer);

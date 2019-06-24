@@ -7,6 +7,9 @@
 
 namespace kh
 {
+// Sends KinectIntrinsics and Kinect frames to a Receiver using the socket_.
+// Receives socket_ through its constructor.
+// Can receive messages from the Receiver that Kinect frames were successfully sent.
 class Sender
 {
 public:

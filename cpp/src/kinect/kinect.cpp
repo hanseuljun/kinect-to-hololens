@@ -17,6 +17,7 @@ bool KinectDevice::isAvailable()
     return sensor_->isAvailable();
 }
 
+// Trys acquiring a frame. Returns nullptr if there is a problem obtaining the frame.
 std::unique_ptr<KinectFrame> KinectDevice::acquireFrame()
 {
     auto multi_source_frame = frame_reader_->getMultiSourceFrame();
@@ -35,6 +36,7 @@ std::unique_ptr<KinectFrame> KinectDevice::acquireFrame()
     return std::make_unique<KinectFrame>(std::move(color_frame), std::move(depth_frame));
 }
 
+// Trys acquiring a KinectDevice. Returns nullptr if there is a problem obtaining the frame.
 std::unique_ptr<KinectDevice> obtainKinectDevice()
 {
     auto sensor = raii::KinectSensor::create();
@@ -48,14 +50,14 @@ std::unique_ptr<KinectDevice> obtainKinectDevice()
     return std::make_unique<KinectDevice>(std::move(sensor), std::move(frame_reader));
 }
 
+// Trys acquiring a KinectIntrinsics. Returns nullptr if there is a problem obtaining the frame.
 std::optional<KinectIntrinsics> obtainKinectIntrinsics()
 {
     libfreenect2::Freenect2 freenect2;
     libfreenect2::Freenect2Device* device;
 
     // Don't know why, but at the first attempt to open the device,
-    // it fails with an LIBSUB_ERROR_OTHER when the Kinect is already
-    // connected to the laptop through the official API.
+    // Freenect2 fails with an LIBSUB_ERROR_OTHER.
     for (int i = 0; i < 2; ++i) {
         device = freenect2.openDefaultDevice();
         if (device)

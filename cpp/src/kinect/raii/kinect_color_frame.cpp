@@ -8,6 +8,7 @@ namespace kinect
 {
 namespace raii
 {
+// An RAII class for IColorFrame.
 KinectColorFrame::KinectColorFrame(IColorFrame* color_frame)
     : color_frame_(color_frame)
 {

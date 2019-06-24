@@ -4,6 +4,7 @@
 
 namespace kh
 {
+// The keyframe_interval_ was arbitrarily chosen.
 Vp8Encoder::Vp8Encoder(int width, int height, int target_bitrate)
     : codec_(), image_(), keyframe_interval_(30), frame_index_(0)
 {
@@ -48,6 +49,7 @@ Vp8Encoder::~Vp8Encoder()
         std::cout << "Error from vpx_codec_destroy." << std::endl;
 }
 
+// Encoding YuvImage with the color pixels with libvpx.
 std::vector<uint8_t> Vp8Encoder::encode(YuvImage& yuv_image)
 {
     image_.planes[VPX_PLANE_Y] = yuv_image.y_channel().data();

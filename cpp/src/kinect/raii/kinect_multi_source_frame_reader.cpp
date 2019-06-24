@@ -8,6 +8,7 @@ namespace kinect
 {
 namespace raii
 {
+// An RAII class for IMultiSourceFrameReader.
 KinectMultiSourceFrameReader::KinectMultiSourceFrameReader(
     IMultiSourceFrameReader* multi_source_frame_reader)
     : multi_source_frame_reader_(multi_source_frame_reader)

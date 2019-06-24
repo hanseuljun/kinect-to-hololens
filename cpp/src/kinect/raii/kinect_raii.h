@@ -8,6 +8,7 @@ namespace kh
 {
 namespace kinect
 {
+// The RAII classes wrapping the official Kinect API.
 namespace raii
 {
 class KinectColorCameraSettings

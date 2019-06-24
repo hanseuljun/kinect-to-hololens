@@ -8,6 +8,7 @@ namespace kinect
 {
 namespace raii
 {
+// An RAII class for IColorCameraSettings.
 KinectColorCameraSettings::KinectColorCameraSettings(
     IColorCameraSettings* color_camera_settings)
     : color_camera_settings_(color_camera_settings)

@@ -8,6 +8,7 @@ namespace kinect
 {
 namespace raii
 {
+// An RAII class for IDepthFrame.
 KinectDepthFrame::KinectDepthFrame(IDepthFrame* depth_frame)
     : depth_frame_(depth_frame)
 {

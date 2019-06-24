@@ -2,11 +2,13 @@
 
 namespace kh
 {
+// Creates a socket with io_context.
 Receiver::Receiver(asio::io_context& io_context)
     : socket_(io_context), message_buffer_()
 {
 }
 
+// Connects to a Sender with the Sender's IP address and port.
 bool Receiver::connect(std::string ip_address, int port)
 {
     asio::ip::tcp::resolver resolver(socket_.get_io_context());
@@ -20,11 +22,13 @@ bool Receiver::connect(std::string ip_address, int port)
     return socket_.is_open();
 }
 
+// Try receiving a message from the sender and returns the message if found.
 std::optional<std::vector<uint8_t>> Receiver::receive()
 {
     return message_buffer_.receive(socket_);
 }
 
+// Sends a message to the Sender that it received a Kinect frame.
 void Receiver::send(int frame_id)
 {
     uint32_t message_size = static_cast<uint32_t>(1 + 4);

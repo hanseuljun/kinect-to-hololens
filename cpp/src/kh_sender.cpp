@@ -4,12 +4,16 @@
 
 namespace kh
 {
+// Receives a moved socket.
 Sender::Sender(asio::ip::tcp::socket&& socket)
     : socket_(std::move(socket))
 {
+    // It is unncessary for the current version of our applications to have a non-blocking socket.
+    // However, it might be required in the future as multi-threading might happen.
     socket_.non_blocking(true);
 }
 
+// Sends a KinectIntrinsics to a Receiver.
 void Sender::send(kinect::KinectIntrinsics intrinsics)
 {
     static_assert(sizeof(intrinsics.color_params) == 26 * 4);
@@ -36,6 +40,7 @@ void Sender::send(kinect::KinectIntrinsics intrinsics)
     sendMessageBuffer(socket_, buffer);
 }
 
+// Sends a Kinect frame to a Receiver.
 void Sender::send(int frame_id, std::vector<uint8_t>& vp8_frame, std::vector<uint8_t> rvl_frame)
 {
     uint32_t message_size = static_cast<uint32_t>(1 + 4 + 4 + vp8_frame.size() + 4 + rvl_frame.size());
@@ -70,6 +75,7 @@ void Sender::send(int frame_id, std::vector<uint8_t>& vp8_frame, std::vector<uin
     sendMessageBuffer(socket_, buffer);
 }
 
+// Receives a message from a Receiver that includes an ID of a Kinect frame that was sent.
 std::optional<std::vector<uint8_t>> Sender::receive()
 {
     return message_buffer_.receive(socket_);

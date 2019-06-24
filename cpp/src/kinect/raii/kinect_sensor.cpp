@@ -8,6 +8,7 @@ namespace kinect
 {
 namespace raii
 {
+// An RAII class for IKinectSensor.
 KinectSensor::KinectSensor(IKinectSensor* kinect_sensor)
     : kinect_sensor_(kinect_sensor)
 {

@@ -4,7 +4,8 @@
 
 namespace kh
 {
-// Downsample width and height by 2.
+// Receives color pixels from the Kinect and converts it into a frame formatted Yuv420 for Vp8Encoder,
+// downsampling width and height by 2.
 YuvImage createHalvedYuvImageFromKinectColorBuffer(uint8_t* buffer)
 {
     // The width and height of Kinect's color frames.
@@ -14,11 +15,12 @@ YuvImage createHalvedYuvImageFromKinectColorBuffer(uint8_t* buffer)
     const int DOWNSAMPLED_WIDTH = WIDTH / 2;
     const int DOWNSAMPLED_HEIGHT = HEIGHT / 2;
 
-    // assumes ColorImageFormat_Yuy2
+    // Sizes assume Kinect runs in ColorImageFormat_Yuy2.
     std::vector<uint8_t> y_channel(DOWNSAMPLED_WIDTH * DOWNSAMPLED_HEIGHT);
     std::vector<uint8_t> u_channel(DOWNSAMPLED_WIDTH * DOWNSAMPLED_HEIGHT / 4);
     std::vector<uint8_t> v_channel(DOWNSAMPLED_WIDTH * DOWNSAMPLED_HEIGHT / 4);
 
+    // Conversion of the Y channels of the pixels.
     int y_channel_index = 0;
     for (int j = 0; j < DOWNSAMPLED_HEIGHT; ++j) {
         int buffer_index = j * WIDTH * 4;
@@ -28,6 +30,7 @@ YuvImage createHalvedYuvImageFromKinectColorBuffer(uint8_t* buffer)
         }
     }
 
+    // Calculation of the U and V channels of the pixels.
     int uv_width = WIDTH / 2;
     int uv_height = HEIGHT / 2;
     int downsampled_uv_width = uv_width / 2;
@@ -47,6 +50,7 @@ YuvImage createHalvedYuvImageFromKinectColorBuffer(uint8_t* buffer)
     return YuvImage(std::move(y_channel), std::move(u_channel), std::move(v_channel), DOWNSAMPLED_WIDTH, DOWNSAMPLED_HEIGHT);
 }
 
+// A helper function for createYuvImageFromAvFrame that converts a AVFrame into a std::vector.
 std::vector<uint8_t> convertPicturePlaneToBytes(uint8_t* data, int line_size, int width, int height)
 {
     std::vector<uint8_t> bytes(width * height);
@@ -56,6 +60,7 @@ std::vector<uint8_t> convertPicturePlaneToBytes(uint8_t* data, int line_size, in
     return bytes;
 }
 
+// Converts an outcome of Vp8Deocder into YuvImage so it can be converted for OpenCV with createCvMatFromYuvImage().
 YuvImage createYuvImageFromAvFrame(AVFrame* av_frame)
 {
     return YuvImage(
@@ -66,6 +71,8 @@ YuvImage createYuvImageFromAvFrame(AVFrame* av_frame)
         av_frame->height);
 }
 
+// A helper function for rvl::compress that also adds consistency through our codebase
+// since it is similar to createHalvedYuvImageFromKinectColorBuffer().
 std::vector<uint8_t> createRvlFrameFromKinectDepthBuffer(uint16_t* buffer)
 {
     // The width and height of Kinect's depth frames.
@@ -75,6 +82,8 @@ std::vector<uint8_t> createRvlFrameFromKinectDepthBuffer(uint16_t* buffer)
     return rvl::compress(buffer, WIDTH * HEIGHT);
 }
 
+// A helper function for rvl::decompress that also adds consistency through our codebase
+// since it is similar to createHalvedYuvImageFromKinectColorBuffer().
 std::vector<uint16_t> createDepthImageFromRvlFrame(uint8_t* rvl_frame)
 {
     // The width and height of Kinect's depth frames.
