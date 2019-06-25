@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+// A class that creates Unity textures using the external methods of Plugin.cs.
+// Through the methods, the Unity textures become wrappers of single channel Direct3D textures.
 public class TextureGroup
 {
     public Texture YTexture { get; private set; }

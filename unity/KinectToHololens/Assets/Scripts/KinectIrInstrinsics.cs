@@ -1,4 +1,5 @@
-﻿public class KinectIrIntrinsics
+﻿// A data class for intrinsics of a Kinect depth camera.
+public class KinectIrIntrinsics
 {
     public float Fx { get; private set; }
     public float Fy { get; private set; }

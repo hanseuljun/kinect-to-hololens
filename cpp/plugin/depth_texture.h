@@ -6,6 +6,7 @@
 
 namespace kh
 {
+// A class for the texture for Kinect depth pixels.
 class DepthTexture
 {
 public:

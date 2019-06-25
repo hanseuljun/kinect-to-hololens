@@ -1,5 +1,6 @@
 ﻿using System;
 
+// A class that contains a pointer to a Vp8Decoder in KinectToHololensPlugin.dll.
 public class Vp8Decoder
 {
     private IntPtr ptr;

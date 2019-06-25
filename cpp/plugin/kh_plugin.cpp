@@ -4,6 +4,7 @@
 
 typedef void* VoidPtr;
 
+// External functions for Unity C# scripts.
 extern "C" VoidPtr UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API create_vp8_decoder()
 {
     return new kh::Vp8Decoder;

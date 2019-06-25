@@ -7,6 +7,7 @@ namespace kh
 ChannelTexture::ChannelTexture(ID3D11Device* device, int width, int height)
 	: width_(width), height_(height), texture_(nullptr)
 {
+    // D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE are chosen to update pixels in ChannelTexture::updatePixels().
     D3D11_TEXTURE2D_DESC desc;
     desc.Width = width;
     desc.Height = height;
@@ -41,6 +42,8 @@ ID3D11ShaderResourceView* ChannelTexture::getTextureView(ID3D11Device* device)
 	return texture_view;
 }
 
+// Update the pixels of the texture with a FFmpegFrame.
+// index is to tell which channel (Y, U, or V) is this texture for.
 void ChannelTexture::updatePixels(ID3D11Device* device,
 								  ID3D11DeviceContext* device_context,
 								  int width,

@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.XR.WSA.Input;
 
+// The main script for scene HololensDemo.
 public class HololensDemoManager : MonoBehaviour
 {
     private enum InputState

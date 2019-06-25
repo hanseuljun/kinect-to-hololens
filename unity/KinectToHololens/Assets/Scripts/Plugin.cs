@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+// Class with static methods that are bridging to the external functions of KinectToHololensPlugin.dll.
 public static class Plugin
 {
     private const string DllName = "KinectToHololensPlugin";

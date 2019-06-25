@@ -1,4 +1,5 @@
-﻿public class KinectColorIntrinsics
+﻿// A data class for intrinsics of a Kinect color camera.
+public class KinectColorIntrinsics
 {
     public float Fx { get; private set; }
     public float Fy { get; private set; }

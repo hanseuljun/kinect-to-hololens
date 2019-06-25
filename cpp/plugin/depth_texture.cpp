@@ -8,6 +8,7 @@ namespace kh
 DepthTexture::DepthTexture(ID3D11Device* device, int width, int height)
 	: width_(width), height_(height), texture_(nullptr)
 {
+    // D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE are chosen to update pixels in DepthTexture::updatePixels().
     D3D11_TEXTURE2D_DESC desc;
     desc.Width = width;
     desc.Height = height;
@@ -42,6 +43,8 @@ ID3D11ShaderResourceView* DepthTexture::getTextureView(ID3D11Device* device)
 	return texture_view;
 }
 
+// Update the pixels of the texture with depth pixels compressed by RVL.
+// The pixels get decompressed and assigned at once for optimization.
 void DepthTexture::updatePixels(ID3D11Device* device,
 								ID3D11DeviceContext* device_context,
 								int width,
@@ -55,7 +58,7 @@ void DepthTexture::updatePixels(ID3D11Device* device,
 		throw std::exception(str.c_str());
 	}
 
-	// row_pitch should be for uint16* (divided by two) while mapped.RowPitch is for bytes.
+	// row_pitch should be divided by two to support uint16* since mapped.RowPitch is for bytes.
 	int row_pitch = mapped.RowPitch / 2;
 	rvl::decompress(frame.data(), reinterpret_cast<uint16_t*>(mapped.pData), width, height, row_pitch);
 

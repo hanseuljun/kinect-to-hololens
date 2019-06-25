@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+// A class with helper static methods for methods of Plugin.cs.
 public static class PluginHelper
 {
     public static void InitTextureGroup()

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
 
+// A Unity script that renderers pixels of a Kinect with a corresponding KinectScreen.
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class ScreenRenderer : MonoBehaviour
 {
@@ -8,13 +9,14 @@ public class ScreenRenderer : MonoBehaviour
     public MeshRenderer meshRenderer;
     public Camera headsetCamera;
 
-    // Called right before this object gets rendered.
+    // Updates _VertexOffsetXVector and _VertexOffsetYVector so the rendered quads can face the headsetCamera.
+    // This method gets called right before this ScreenRenderer gets rendered.
     void OnWillRenderObject()
     {
         if (meshRenderer.sharedMaterial == null)
             return;
 
-        // Ignore other cameras such as the scene camera of Unity Editor.
+        // Ignore when this method is called while Unity rendering the Editor's "Scene" (not the "Game" part of the editor).
         if (Camera.current != headsetCamera)
             return;
 
@@ -39,9 +41,7 @@ public class ScreenRenderer : MonoBehaviour
     {
         const int KINECT_COLOR_WIDTH = 1920;
         const int KINECT_COLOR_HEIGHT = 1080;
-        const int KINECT_DEPTH_WIDTH = 512;
-        const int KINECT_DEPTH_HEIGHT = 424;
-        meshFilter.mesh = CreateMesh(KINECT_DEPTH_WIDTH, KINECT_DEPTH_HEIGHT, kinectScreen);
+        meshFilter.mesh = CreateMesh(kinectScreen);
 
         meshRenderer.sharedMaterial.SetFloat("_ColorFrameWidthReciprocal", 1.0f / KINECT_COLOR_WIDTH);
         meshRenderer.sharedMaterial.SetFloat("_ColorFrameHeightReciprocal", 1.0f / KINECT_COLOR_HEIGHT);
@@ -52,45 +52,46 @@ public class ScreenRenderer : MonoBehaviour
         meshRenderer.sharedMaterial.SetFloat("_ColorShiftMForMeters", kinectScreen.ColorIntrinsics.ShiftM / 1000.0f);
     }
 
-    private static Mesh CreateMesh(int depthWidth,
-                                    int depthHeight,
-                                    KinectScreen kinect2Screen)
+    private static Mesh CreateMesh(KinectScreen kinect2Screen)
     {
-        // Interpolation of vertices. A [depthWidth * depthHeight] screen into a [(depthWidth - 1) * (depthHeight - 1)].
-        var interploatedVertices = new Vector3[(depthWidth - 1) * (depthHeight - 1)];
-        var interploatedUvs = new Vector2[(depthWidth - 1) * (depthHeight - 1)];
-        for (int i = 0; i < depthWidth - 1; ++i)
-        {
-            for (int j = 0; j < depthHeight - 1; ++j)
-            {
-                interploatedVertices[i + j * (depthWidth - 1)] = (kinect2Screen.Vertices[(i + 0) + (j + 0) * depthWidth]
-                                                                + kinect2Screen.Vertices[(i + 1) + (j + 0) * depthWidth]
-                                                                + kinect2Screen.Vertices[(i + 0) + (j + 1) * depthWidth]
-                                                                + kinect2Screen.Vertices[(i + 1) + (j + 1) * depthWidth]) * 0.25f;
+        const int KINECT_DEPTH_WIDTH = 512;
+        const int KINECT_DEPTH_HEIGHT = 424;
 
-                interploatedUvs[i + j * (depthWidth - 1)] = (kinect2Screen.Uv[(i + 0) + (j + 0) * depthWidth]
-                                                            + kinect2Screen.Uv[(i + 1) + (j + 0) * depthWidth]
-                                                            + kinect2Screen.Uv[(i + 0) + (j + 1) * depthWidth]
-                                                            + kinect2Screen.Uv[(i + 1) + (j + 1) * depthWidth]) * 0.25f;
+        // Interpolation of vertices. A [depthWidth * depthHeight] screen into a [(depthWidth - 1) * (depthHeight - 1)].
+        var interploatedVertices = new Vector3[(KINECT_DEPTH_WIDTH - 1) * (KINECT_DEPTH_HEIGHT - 1)];
+        var interploatedUvs = new Vector2[(KINECT_DEPTH_WIDTH - 1) * (KINECT_DEPTH_HEIGHT - 1)];
+        for (int i = 0; i < KINECT_DEPTH_WIDTH - 1; ++i)
+        {
+            for (int j = 0; j < KINECT_DEPTH_HEIGHT - 1; ++j)
+            {
+                interploatedVertices[i + j * (KINECT_DEPTH_WIDTH - 1)] = (kinect2Screen.Vertices[(i + 0) + (j + 0) * KINECT_DEPTH_WIDTH]
+                                                                       +  kinect2Screen.Vertices[(i + 1) + (j + 0) * KINECT_DEPTH_WIDTH]
+                                                                       +  kinect2Screen.Vertices[(i + 0) + (j + 1) * KINECT_DEPTH_WIDTH]
+                                                                       +  kinect2Screen.Vertices[(i + 1) + (j + 1) * KINECT_DEPTH_WIDTH]) * 0.25f;
+
+                interploatedUvs[i + j * (KINECT_DEPTH_WIDTH - 1)] = (kinect2Screen.Uv[(i + 0) + (j + 0) * KINECT_DEPTH_WIDTH]
+                                                                  +  kinect2Screen.Uv[(i + 1) + (j + 0) * KINECT_DEPTH_WIDTH]
+                                                                  +  kinect2Screen.Uv[(i + 0) + (j + 1) * KINECT_DEPTH_WIDTH]
+                                                                  +  kinect2Screen.Uv[(i + 1) + (j + 1) * KINECT_DEPTH_WIDTH]) * 0.25f;
             }
         }
 
-        var vertices = new Vector3[(depthWidth - 2) * (depthHeight - 2)];
-        var uvs = new Vector2[(depthWidth - 2) * (depthHeight - 2)];
-        var uvs2 = new Vector2[(depthWidth - 2) * (depthHeight - 2)];
-        var uvs3 = new Vector2[(depthWidth - 2) * (depthHeight - 2)];
-        var uvs4 = new Vector2[(depthWidth - 2) * (depthHeight - 2)];
+        var vertices = new Vector3[(KINECT_DEPTH_WIDTH - 2) * (KINECT_DEPTH_HEIGHT - 2)];
+        var uvs = new Vector2[(KINECT_DEPTH_WIDTH - 2) * (KINECT_DEPTH_HEIGHT - 2)];
+        var uvs2 = new Vector2[(KINECT_DEPTH_WIDTH - 2) * (KINECT_DEPTH_HEIGHT - 2)];
+        var uvs3 = new Vector2[(KINECT_DEPTH_WIDTH - 2) * (KINECT_DEPTH_HEIGHT - 2)];
+        var uvs4 = new Vector2[(KINECT_DEPTH_WIDTH - 2) * (KINECT_DEPTH_HEIGHT - 2)];
 
-        for (int i = 0; i < depthWidth - 2; ++i)
+        for (int i = 0; i < KINECT_DEPTH_WIDTH - 2; ++i)
         {
-            for (int j = 0; j < depthHeight - 2; ++j)
+            for (int j = 0; j < KINECT_DEPTH_HEIGHT - 2; ++j)
             {
-                int index = i + j * (depthWidth - 2);
-                var vertex = interploatedVertices[(i + 0) + (j + 0) * (depthWidth - 1)];
-                var vertexOffset = interploatedVertices[(i + 1) + (j + 1) * (depthWidth - 1)] - vertex;
+                int index = i + j * (KINECT_DEPTH_WIDTH - 2);
+                var vertex = interploatedVertices[(i + 0) + (j + 0) * (KINECT_DEPTH_WIDTH - 1)];
+                var vertexOffset = interploatedVertices[(i + 1) + (j + 1) * (KINECT_DEPTH_WIDTH - 1)] - vertex;
 
-                var uv = interploatedUvs[(i + 0) + (j + 0) * (depthWidth - 1)];
-                var uvOffset = interploatedUvs[(i + 1) + (j + 1) * (depthWidth - 1)] - uv;
+                var uv = interploatedUvs[(i + 0) + (j + 0) * (KINECT_DEPTH_WIDTH - 1)];
+                var uvOffset = interploatedUvs[(i + 1) + (j + 1) * (KINECT_DEPTH_WIDTH - 1)] - uv;
 
                 // As each quad is for a pixel in the depth map, they share a same uv (color map coordinate), uv2 (depth map coordinate) value.
                 //uv[index] = kinect2Screen.Uv[(i + 1) + (j + 1) * depthWidth];
@@ -99,7 +100,7 @@ public class ScreenRenderer : MonoBehaviour
 
                 vertices[index] = vertex;
                 uvs[index] = uv;
-                uvs2[index] = kinect2Screen.Uv2[(i + 1) + (j + 1) * depthWidth];
+                uvs2[index] = kinect2Screen.Uv2[(i + 1) + (j + 1) * KINECT_DEPTH_WIDTH];
                 uvs3[index] = new Vector2(vertexOffset.x, vertexOffset.y);
                 uvs4[index] = uvOffset;
             }
@@ -109,6 +110,9 @@ public class ScreenRenderer : MonoBehaviour
         for (int i = 0; i < triangles.Length; ++i)
             triangles[i] = i;
 
+        // Without the bounds, Unity decides whether to render this mesh or not based on the vertices calculated here.
+        // This causes Unity not rendering the mesh transformed by the depth texture even when the transformed one
+        // belongs to the viewport of the camera.
         var bounds = new Bounds(Vector3.zero, Vector3.one * 1000.0f);
 
         var mesh = new Mesh()

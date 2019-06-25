@@ -78,12 +78,6 @@ void _send_frames(int port)
         return;
     }
 
-    // device->isAvailable() returns false when there is a problem or there is no connect Kinect.
-    // And, a Kinect has to be connected for a sender to have frames to send.
-    // It is possible to use the Kinect Studio when there is no real Kinect.
-    std::cout << "Waiting for a device to be (re)connected..." << std::endl;
-    while (!device->isAvailable());
-
     // The width and height of the Vp8Encoder is the half of the Kinect since
     // the frames will be halved before getting encoded.
     // The bitrate is chosen arbitrarily.

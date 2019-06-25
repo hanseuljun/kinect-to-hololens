@@ -4,6 +4,7 @@
 #include "unity/IUnityGraphicsD3D11.h"
 #include "texture_group.h"
 
+// Unity and Direct3D varaibles that are saved for future use that is mainly through OnRenderEvent().
 static IUnityInterfaces* unity_interfaces_ = nullptr;
 static IUnityGraphics* unity_graphics_ = nullptr;
 static ID3D11Device* d3d11_device_ = nullptr;
@@ -16,10 +17,10 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     case kUnityGfxDeviceEventInitialize: {
         IUnityGraphicsD3D11* d3d = unity_interfaces_->Get<IUnityGraphicsD3D11>();
 		d3d11_device_ = d3d->GetDevice();
-		// Has to have this if statement since including audio spatilizer invokes OnGraphicsDeviceEvent
+		// Has to have this if statement since including audio spatializer invokes OnGraphicsDeviceEvent
 		// with kUnityGfxDeviceEventInitialize when d3d->GetDevice() returns null.
-		// I guess, in this case, this function gets invoked twice and d3d->GetDevice() returns null
-		// at the first time.
+		// I guess that this function gets invoked twice when the audio spatializer is turned on,
+        // and d3d->GetDevice() returns null during the first time, but not the second time.
 		if (d3d11_device_)
 			d3d11_device_->GetImmediateContext(&d3d11_device_context_);
         break;
@@ -51,8 +52,11 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnit
     unity_graphics_ = unity_interfaces_->Get<IUnityGraphics>();
     unity_graphics_->RegisterDeviceEventCallback(OnGraphicsDeviceEvent);
 
-    // Run OnGraphicsDeviceEvent(initialize) manually on plugin load
-    // to not miss the event in case the graphics device is already initialized
+    // OnGraphicsDeviceEvent() manually called since the editor of Unity may
+    // call OnGraphicsDeviceEvent() only for the first time the scene gets played,
+    // not every time.
+    // For HoloLens, 64-bit means Unity editor since current Unity editors only support 64-bit,
+    // while HoloLens runs on a 32-bit OS.
 #ifdef _WIN64
     OnGraphicsDeviceEvent(kUnityGfxDeviceEventInitialize);
 #endif
