@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// A script for positing a text on top of the user's head.
 public class StatusText : MonoBehaviour
 {
     public Transform cameraTransform;

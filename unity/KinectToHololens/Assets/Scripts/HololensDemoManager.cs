@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.XR.WSA.Input;
 
-// The main script for scene HololensDemo.
+// The main script for the HololensDemo scene.
 public class HololensDemoManager : MonoBehaviour
 {
     private enum InputState
@@ -12,21 +12,31 @@ public class HololensDemoManager : MonoBehaviour
         IpAddress, Port
     }
 
+    // The main camera's Transform.
     public Transform cameraTransform;
+    // The TextMesh placed above user's head.
     public TextMesh statusText;
+    // The root of the scene that includes everything else except the main camera.
+    // This provides a convenient way to place everything in front of the camera.
     public Transform scenceRootTransform;
+    // TextMeshes for the UI.
     public TextMesh ipAddressText;
     public TextMesh ipAddressInputField;
     public TextMesh portText;
     public TextMesh portInputField;
     public TextMesh instructionText;
+    // For rendering the Kinect pixels in 3D.
     public Material screenMaterial;
     public ScreenRenderer screenRenderer;
 
+    // To recognize when the user taps.
     private GestureRecognizer gestureRecognizer;
+    // Varaibles that represent states of the scene.
     private InputState inputState;
     private bool textureCreated;
+    // The Receiver which receives Kinect data over the network.
     private Receiver receiver;
+    // Decodes Kinect frames that were encoded before being sent over the network.
     private Vp8Decoder decoder;
 
     public TextMesh ActiveInputField
@@ -57,6 +67,7 @@ public class HololensDemoManager : MonoBehaviour
         SetInputState(InputState.IpAddress);
         PluginHelper.InitTextureGroup();
 
+        // Prepare a GestureRecognizer to recognize taps.
         gestureRecognizer.Tapped += OnTapped;
         gestureRecognizer.StartCapturingGestures();
 
@@ -65,18 +76,24 @@ public class HololensDemoManager : MonoBehaviour
 
     void Update()
     {
+        // Space key resets the scene to be placed in front of the camera.
         if(Input.GetKeyDown(KeyCode.Space))
         {
             ResetView();
         }
 
+        // Sends virtual keyboards strokes to the TextMeshes for the IP address and the port.
         AbsorbInput();
 
-        if (!textureCreated)
+        // If texture is not created, create and assign them to quads.
+        if(!textureCreated)
         {
-            if (Plugin.texture_group_get_y_texture_view().ToInt64() == 0)
+            // Check whether the native plugin has Direct3D textures that
+            // can be connected to Unity textures.
+            if(Plugin.texture_group_get_y_texture_view().ToInt64() == 0)
                 return;
 
+            // TextureGroup includes Y, U, V, and a depth texture.
             var textureGroup = new TextureGroup();
             screenMaterial.SetTexture("_YTex", textureGroup.YTexture);
             screenMaterial.SetTexture("_UTex", textureGroup.UTexture);
@@ -85,9 +102,11 @@ public class HololensDemoManager : MonoBehaviour
             textureCreated = true;
         }
 
-        if (receiver == null)
+        // Do not continue if there is no Receiever connected to a Sender.
+        if(receiver == null)
             return;
 
+        // Try receiving a message.
         byte[] message;
         try
         {
@@ -100,25 +119,33 @@ public class HololensDemoManager : MonoBehaviour
             return;
         }
 
-        if (message == null)
+        // Continue only if there is a message.
+        if(message == null)
             return;
 
-        if (message[0] == 0)
+        // Prepare the ScreenRenderer with the received KinectIntrinsics.
+        if(message[0] == 0)
         {
             var kinectScreen = CreateKinectScreenFromIntrinsicsMessage(message);
             screenRenderer.SetKinectScreen(kinectScreen);
         }
+        // When a Kinect frame got received.
         else if (message[0] == 1)
         {
             int cursor = 1;
             int frameId = BitConverter.ToInt32(message, cursor);
             cursor += 4;
 
+            // Notice the Sender that the frame was received through the Receiver.
             receiver.Send(frameId);
 
             int vp8FrameSize = BitConverter.ToInt32(message, cursor);
             cursor += 4;
 
+            // Marshal.AllocHGlobal, Marshal.Copy, and Marshal.FreeHGlobal are like
+            // malloc, memcpy, and free of C.
+            // This is required since vp8FrameBytes gets sent to a Vp8Decoder
+            // inside the native plugin.
             IntPtr vp8FrameBytes = Marshal.AllocHGlobal(vp8FrameSize);
             Marshal.Copy(message, cursor, vp8FrameBytes, vp8FrameSize);
             var ffmpegFrame = decoder.Decode(vp8FrameBytes, vp8FrameSize);
@@ -129,6 +156,9 @@ public class HololensDemoManager : MonoBehaviour
             int rvlFrameSize = BitConverter.ToInt32(message, cursor);
             cursor += 4;
 
+            // Marshal.AllocHGlobal, Marshal.Copy, and Marshal.FreeHGlobal are like
+            // malloc, memcpy, and free of C.
+            // This is required since rvlFrameBytes gets sent to the native plugin.
             IntPtr rvlFrameBytes = Marshal.AllocHGlobal(rvlFrameSize);
             Marshal.Copy(message, cursor, rvlFrameBytes, rvlFrameSize);
             Plugin.texture_group_set_rvl_frame(rvlFrameBytes, rvlFrameSize);
@@ -141,21 +171,27 @@ public class HololensDemoManager : MonoBehaviour
                 statusText.text = logString;
             }
 
+            // Invokes a function to be called in a render thread.
             PluginHelper.UpdateTextureGroup();
         }
     }
 
     private void OnTapped(TappedEventArgs args)
     {
+        // Place the scene in front of the camera when the user taps.
         ResetView();
     }
 
+    // Places everything in front of the camera by positing and turning a root transform for
+    // everything else except the camera.
     private void ResetView()
     {
         scenceRootTransform.localPosition = cameraTransform.localPosition;
         scenceRootTransform.localRotation = cameraTransform.localRotation;
     }
 
+    // Sends keystrokes of the virtual keyboard to TextMeshes.
+    // Try connecting the Receiver to a Sender when the user pressed the enter key.
     private void AbsorbInput()
     {
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.Tab))
@@ -201,6 +237,7 @@ public class HololensDemoManager : MonoBehaviour
         }
     }
 
+    // A helper method for AbsorbInput().
     private void AbsorbKeyCode(KeyCode keyCode, char c)
     {
         if(Input.GetKeyDown(keyCode))
@@ -213,10 +250,12 @@ public class HololensDemoManager : MonoBehaviour
     {
         UiVisibility = false;
 
+        // The default IP address is 127.0.0.1.
         string ipAddress = ipAddressInputField.text;
         if (ipAddress.Length == 0)
             ipAddress = "127.0.0.1";
 
+        // The default port is 7777.
         string portString = portInputField.text;
         int port = portString.Length != 0 ? int.Parse(portString) : 7777;
 
@@ -253,6 +292,8 @@ public class HololensDemoManager : MonoBehaviour
         this.inputState = inputState;
     }
 
+    // Parses a message that contains a KinectIntrinsics and uses the KinectIntrinsics to build a KinectScreen
+    // that gets used for properly rendering the Kinect frame pixels in 3D.
     private static KinectScreen CreateKinectScreenFromIntrinsicsMessage(byte[] message)
     {
 

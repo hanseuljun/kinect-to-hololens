@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
+// Receives messages from a Sender connected to a Kinect.
 public class Receiver
 {
     private TcpSocket socket;
@@ -24,6 +25,7 @@ public class Receiver
         return messageBuffer.Receive(socket);
     }
 
+    // Sends a message to the Sender that a Kinect frame was received.
     public void Send(int frameId)
     {
         int packetSize = 5;
