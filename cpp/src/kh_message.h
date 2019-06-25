@@ -19,11 +19,11 @@ private:
     // The buffer for the size of the actual mesasge.
     std::vector<uint8_t> size_bytes_;
     // Cursor of size_bytes_.
-    int size_cursor_;
+    size_t size_cursor_;
     // The buffer for the actual message.
     std::vector<uint8_t> message_bytes_;
     // Cursor of message_cursor_.
-    int message_cursor_;
+    size_t message_cursor_;
 };
 
 // A function for sending the buffer through the socket.

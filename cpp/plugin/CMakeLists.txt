@@ -1,3 +1,4 @@
+# Source files for the Unity plugin.
 set(SOURCE_FILES
   plugin.def
   plugin.cpp

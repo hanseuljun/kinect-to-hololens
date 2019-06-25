@@ -10,7 +10,7 @@ static IUnityGraphics* unity_graphics_ = nullptr;
 static ID3D11Device* d3d11_device_ = nullptr;
 static ID3D11DeviceContext* d3d11_device_context_ = nullptr;
 
-// Callback function to handle UnityGfxDeviceEvents.
+// A callback function for UnityGfxDeviceEvents.
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
 {
     switch(eventType) {
@@ -33,6 +33,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     };
 }
 
+// Gets called during a render thread through GL.IssuePluginEvent() in Unity scripts.
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
 {
 	switch (eventID) {
@@ -45,7 +46,7 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
 	}
 }
 
-// Function that gets called by Unity.
+// A function that gets called by Unity when the application using this plugin starts.
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* interfaces)
 {
     unity_interfaces_ = interfaces;
@@ -62,7 +63,7 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnit
 #endif
 }
 
-// Function that gets called by Unity.
+// A function that Unity calls when the application using this plugin terminates.
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
 {
     unity_graphics_->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
@@ -83,6 +84,7 @@ extern "C" bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API has_d3d11_device()
 	return d3d11_device_ != nullptr;
 }
 
+// A getter function that allows Unity to call OnRenderEvent() in a render thread.
 extern "C" UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API get_render_event_function_pointer()
 {
     return OnRenderEvent;

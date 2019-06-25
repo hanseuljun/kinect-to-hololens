@@ -1,3 +1,7 @@
+# Source files for the demos.
+# Both the KinectReaderDemo and the KinectSenderDemo
+# cannot be built for 32-bit since they require access to
+# libfreenect2, which we have no 32-bit DLL file.
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   add_executable(KinectReaderDemo
     kinect_reader_demo.cpp

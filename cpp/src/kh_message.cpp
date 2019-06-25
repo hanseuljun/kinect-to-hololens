@@ -18,7 +18,7 @@ std::optional<std::vector<uint8_t>> MessageBuffer::receive(asio::ip::tcp::socket
     // Try getting size_bytes_.
     if (size_cursor_ < size_bytes_.size()) {
         std::error_code error_code;
-        int size_result = socket.receive(asio::buffer(size_bytes_.data() + size_cursor_, size_bytes_.size() - size_cursor_), 0, error_code);
+        size_t size_result = socket.receive(asio::buffer(size_bytes_.data() + size_cursor_, size_bytes_.size() - size_cursor_), 0, error_code);
         if (error_code && error_code != asio::error::would_block) {
             auto error_message = std::string("Error receiving message size: ") + std::to_string(error_code.value());
             throw std::exception(error_message.c_str());
@@ -37,7 +37,7 @@ std::optional<std::vector<uint8_t>> MessageBuffer::receive(asio::ip::tcp::socket
 
     // Try getting message_bytes_ until the number of obtained bytes matches the information from size_bytes_.
     std::error_code error_code;
-    int message_result = socket.receive(asio::buffer(message_bytes_.data() + message_cursor_, message_bytes_.size() - message_cursor_), 0, error_code);
+    size_t message_result = socket.receive(asio::buffer(message_bytes_.data() + message_cursor_, message_bytes_.size() - message_cursor_), 0, error_code);
     if (error_code && error_code != asio::error::would_block) {
         auto error_message = std::string("Error receiving message: ") + std::to_string(error_code.value());
         throw std::exception(error_message.c_str());

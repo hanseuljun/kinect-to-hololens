@@ -106,7 +106,7 @@ void _send_frames(int port)
     // Variables for profiling the sender.
     auto start = std::chrono::system_clock::now();
     int frame_count = 0;
-    int frame_size = 0;
+    size_t frame_size = 0;
     for (;;) {
         // Try acquiring a kh::Kinect::KinectFrame until a vaild one gets found.
         auto kinect_frame = device->acquireFrame();
