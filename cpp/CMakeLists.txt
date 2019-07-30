@@ -17,6 +17,8 @@ set(LIBFREENECT2_DIR ${PROJECT_SOURCE_DIR}/third_party/libfreenect2-0.2.0-usbdk-
 find_path(VCPKG_INCLUDE_DIR NAMES asio.hpp PATH_SUFFIXES asio)
 include_directories(${VCPKG_INCLUDE_DIR})
 
+set(Libvpx_LIB ${VCPKG_INCLUDE_DIR}/../lib/vpxmd.lib)
+
 # Set ${FFMPEG_LIBRARIES} for FFmpeg.
 unset(FFMPEG_LIBRARIES CACHE)
 foreach(FFMPEG_SUBLIBRARY avcodec avdevice avfilter avformat avutil swresample swscale)

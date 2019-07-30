@@ -4,7 +4,7 @@
 
 namespace kh
 {
-// The keyframe_interval_ was arbitrarily chosen.
+// The keyframe_interval_ was chosen arbitrarily.
 Vp8Encoder::Vp8Encoder(int width, int height, int target_bitrate)
     : codec_(), image_(), keyframe_interval_(30), frame_index_(0)
 {
