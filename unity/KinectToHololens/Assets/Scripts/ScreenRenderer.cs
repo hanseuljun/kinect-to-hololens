@@ -21,17 +21,28 @@ public class ScreenRenderer : MonoBehaviour
             return;
 
         var cameraTransform = Camera.current.transform;
-        var worldCameraRightVector = cameraTransform.TransformDirection(new Vector3(1.0f, 0.0f, 0.0f));
-        var worldCameraUpVector = cameraTransform.TransformDirection(new Vector3(0.0f, 1.0f, 0.0f));
-        var localCameraRightVector = transform.InverseTransformDirection(worldCameraRightVector);
-        var localCameraUpVector = transform.InverseTransformDirection(worldCameraUpVector);
+        var worldCameraFrontVector = cameraTransform.TransformDirection(new Vector3(0.0f, 0.0f, 1.0f));
+
+        // Using the y direction as the up vector instead the up vector of the camera allows the user to feel more
+        // comfortable as it preserves the sense of gravity.
+        // Getting the right vector directly from the camera transform through zeroing its y-component does not
+        // work when the y-component of the camera's up vector is negative. While it is possible to solve the problem
+        // with an if statement, inverting when the y-component is negative, I decided to detour this case with
+        // usage of the cross product with the front vector.
+        var worldUpVector = new Vector3(0.0f, 1.0f, 0.0f);
+        var worldRightVector = Vector3.Cross(worldUpVector, worldCameraFrontVector);
+        worldRightVector = new Vector3(worldRightVector.x, 0.0f, worldRightVector.z);
+        worldRightVector.Normalize();
+
+        var localRightVector = transform.InverseTransformDirection(worldRightVector);
+        var localUpVector = transform.InverseTransformDirection(worldUpVector);
 
         // The coordinate system of Kinect's textures have (1) its origin at its left-up side.
         // Also, the viewpoint of it is sort of (2) the opposite of the viewpoint of the Hololens, considering the typical use case.
         // Due to (1), vertexOffsetYVector = -localCameraUpVector.
         // Due to (2), vertexOffsetXVector = -localCameraRightVector.
-        var vertexOffsetXVector = -localCameraRightVector;
-        var vertexOffsetYVector = -localCameraUpVector;
+        var vertexOffsetXVector = -localRightVector;
+        var vertexOffsetYVector = -localUpVector;
 
         meshRenderer.sharedMaterial.SetVector("_VertexOffsetXVector", new Vector4(vertexOffsetXVector.x, vertexOffsetXVector.y, vertexOffsetXVector.z, 0.0f));
         meshRenderer.sharedMaterial.SetVector("_VertexOffsetYVector", new Vector4(vertexOffsetYVector.x, vertexOffsetYVector.y, vertexOffsetYVector.z, 0.0f));
