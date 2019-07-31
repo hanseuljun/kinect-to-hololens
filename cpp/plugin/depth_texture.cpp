@@ -1,7 +1,7 @@
 #include "depth_texture.h"
 
 #include <string>
-#include <kh_rvl.h>
+#include "kh_rvl.h"
 
 namespace kh
 {
