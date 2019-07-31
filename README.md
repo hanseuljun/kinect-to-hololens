@@ -1,6 +1,8 @@
 # Kinect to HoloLens
 A pipeline that connects a Kinect v2 and a HoloLens in real-time.
 
+![](kinect-to-hololens.jpg)
+
 # Requirement
 - A Windows 10 computer, a Kinect v2, and a HoloLens.
 - CMake, Unity3D 2018.4, and Visual Studio 2019.
