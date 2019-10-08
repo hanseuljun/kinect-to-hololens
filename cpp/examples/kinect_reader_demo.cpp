@@ -97,7 +97,7 @@ void _display_intrinsics()
 void display_frames()
 {
     for (;;) {
-        std::cout << "Press enter display frames." << std::endl;
+        std::cout << "Press enter to display frames." << std::endl;
         std::string line;
         std::getline(std::cin, line);
         // An kind of an easter egg.

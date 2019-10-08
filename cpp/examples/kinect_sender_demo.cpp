@@ -63,12 +63,14 @@ void _send_frames(int port)
 
     // Collecting KinectIntrinsics.
     // If kh::kinect::obtainKinectIntrinsics() fails, uses get_substitute_kinect_intrinsics().
-    auto intrinsics = kinect::obtainKinectIntrinsics();
-    if (!intrinsics) {
-        std::cout << "Could not find intrinsics of the connected Kinect." << std::endl;
-        std::cout << "Using a substitute KinectIntrinsics." << std::endl;
-        intrinsics = get_substitute_kinect_intrinsics();
-    }
+    //auto intrinsics = kinect::obtainKinectIntrinsics();
+    //if (!intrinsics) {
+    //    std::cout << "Could not find intrinsics of the connected Kinect." << std::endl;
+    //    std::cout << "Using a substitute KinectIntrinsics." << std::endl;
+    //    intrinsics = get_substitute_kinect_intrinsics();
+    //}
+    // libfreenect2 allows access to correct intrinsics, but it is unstable...
+    auto intrinsics = get_substitute_kinect_intrinsics();
 
     // Obtaining kh::kinect::KinectDevice to access Kinect v2 APIs.
     // This is neccessary for the sender to function.
@@ -94,7 +96,9 @@ void _send_frames(int port)
     // Sender is a class that will use the socket to send frames to the receiver that has the socket connected to this socket.
     Sender sender(std::move(socket));
     // The sender sends athe KinectIntrinsics, so the renderer from the receiver side can prepare rendering Kinect frames.
-    sender.send(*intrinsics);
+    //sender.send(*intrinsics);
+    // Use intrinsics instead of *instrinsics which is for libfreenect2.
+    sender.send(intrinsics);
 
     // The amount of frames this sender will send before receiveing a feedback from a receiver.
     const int MAXIMUM_FRAME_ID_DIFF = 2;
@@ -110,8 +114,11 @@ void _send_frames(int port)
     for (;;) {
         // Try acquiring a kh::Kinect::KinectFrame until a vaild one gets found.
         auto kinect_frame = device->acquireFrame();
-        if (!kinect_frame)
+        if (!kinect_frame) {
+            std::cout << "is kinect available: " << device->isAvailable() << std::endl;
+            std::cout << "frame not found" << std::endl;
             continue;
+        }
 
         // Try receiving a frame ID from the receiver and update receiver_frame_id if possible.
         auto receive_result = sender.receive();
@@ -154,6 +161,7 @@ void _send_frames(int port)
 
         // Try sending the frame. Escape the loop if there is a network error.
         try {
+            std::cout << "send a vp8_frame" << std::endl;
             sender.send(frame_id++, vp8_frame, rvl_frame);
         } catch (std::exception& e) {
             std::cout << e.what() << std::endl;

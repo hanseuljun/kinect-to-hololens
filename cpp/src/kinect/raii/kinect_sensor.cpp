@@ -17,6 +17,7 @@ KinectSensor::KinectSensor(IKinectSensor* kinect_sensor)
 KinectSensor::~KinectSensor()
 {
     kinect_sensor_->Close();
+    kinect_sensor_->Release();
 }
 
 std::unique_ptr<KinectSensor> KinectSensor::create()
