@@ -22,10 +22,8 @@ std::unique_ptr<KinectFrame> KinectDevice::acquireFrame()
 {
     auto multi_source_frame = frame_reader_->getMultiSourceFrame();
     // This can mean Kinect having a problem, or simply not having a new frame yet.
-    if (!multi_source_frame) {
-        std::cout << "no multi_source_frame" << std::endl;
+    if (!multi_source_frame)
         return nullptr;
-    }
 
     auto color_frame = multi_source_frame->getColorFrame();
     if (!color_frame)

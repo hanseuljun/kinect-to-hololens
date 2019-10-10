@@ -114,11 +114,8 @@ void _send_frames(int port)
     for (;;) {
         // Try acquiring a kh::Kinect::KinectFrame until a vaild one gets found.
         auto kinect_frame = device->acquireFrame();
-        if (!kinect_frame) {
-            std::cout << "is kinect available: " << device->isAvailable() << std::endl;
-            std::cout << "frame not found" << std::endl;
+        if (!kinect_frame)
             continue;
-        }
 
         // Try receiving a frame ID from the receiver and update receiver_frame_id if possible.
         auto receive_result = sender.receive();
@@ -161,7 +158,6 @@ void _send_frames(int port)
 
         // Try sending the frame. Escape the loop if there is a network error.
         try {
-            std::cout << "send a vp8_frame" << std::endl;
             sender.send(frame_id++, vp8_frame, rvl_frame);
         } catch (std::exception& e) {
             std::cout << e.what() << std::endl;
