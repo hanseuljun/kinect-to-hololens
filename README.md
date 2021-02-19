@@ -1,5 +1,5 @@
 # Kinect to HoloLens
-A pipeline that connects a Kinect v2 and a HoloLens in real-time.
+A pipeline that connects a Kinect v2 and a HoloLens in real-time. For a telepresence system built on top of this work, supporting Azure Kinect and more headsets, see [Telespace](https://telespace.app).
 
 ![](kinect-to-hololens.jpg)
 
